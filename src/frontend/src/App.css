@@ -1,0 +1,121 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f9fafb;
+  color: #111827;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  gap: 2rem;
+}
+
+.app-header {
+  text-align: center;
+}
+
+.app-title {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.app-subtitle {
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.main-content {
+  width: 100%;
+  max-width: 360px;
+}
+
+.card {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.loading {
+  color: #6b7280;
+  padding: 2rem;
+}
+
+.jar-wrapper {
+  width: 160px;
+}
+
+.cookie-jar-svg {
+  width: 100%;
+  height: auto;
+}
+
+.jar-fill {
+  transition: y 0.6s ease, height 0.6s ease;
+}
+
+.level-display {
+  text-align: center;
+}
+
+.level-emoji {
+  display: block;
+  font-size: 2rem;
+  min-height: 2.5rem;
+  line-height: 1;
+}
+
+.level-value {
+  display: block;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.level-label {
+  display: block;
+  color: #6b7280;
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.refill-button {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.refill-button:hover:not(:disabled) {
+  background: #d97706;
+}
+
+.refill-button:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}

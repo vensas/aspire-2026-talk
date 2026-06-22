@@ -1,0 +1,45 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+*.suo
+*.userprefs
+TestResults/
+
+# NuGet
+*.nupkg
+*.snupkg
+project.lock.json
+packages/
+
+# Secrets / local config (user secrets live in AppData, but guard against accidental files)
+**/secrets.json
+**/*.Development.json
+!**/appsettings.Development.json
+
+# Node / frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Python
+**/.venv/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.Python
+
+# Aspire
+.aspire/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+*.swp
+*.swo
