@@ -7,9 +7,13 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OUTPUT="$ROOT/deploy/output/kamal"
 
 echo "Generating Kamal deployment artifacts..."
-PUBLISH_TARGET=kamal aspire publish \
+# Parameters__rabbitmq-password is required because it is declared as a secret
+# parameter with no default (AddParameter("rabbitmq-password", secret: true)).
+# aspire publish is non-interactive and will error without a value. The actual
+# secret is replaced before real deployment via .kamal/secrets.
+env "Parameters__rabbitmq-password=placeholder" PUBLISH_TARGET=kamal \
+  aspire publish \
   --apphost "$ROOT/src/CookieJar.AppHost/CookieJar.AppHost.csproj" \
-  --step generate-kamal-config \
   --output-path "$OUTPUT"
 
 echo ""

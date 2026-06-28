@@ -27,13 +27,14 @@ switch (Environment.GetEnvironmentVariable("PUBLISH_TARGET"))
                 compose.Services["cookie-sensor"].DependsOn["messaging"].Condition = "service_healthy";
             });
         break;
-}
-
-// Kamal: only registered in publish mode, triggered explicitly via --step generate-kamal-config
-if (builder.ExecutionContext.IsPublishMode)
-{
-    builder.AddResource(new KamalDeploymentResource("kamal"))
-        .WithPipelineStepFactory(KamalPipelineStep.Create);
+    case "kamal":
+        builder.AddResource(new KamalDeploymentResource("kamal")
+        {
+            ServiceName = "cookiejar",
+            Architecture = "arm64",
+            ExtraSecretEnvVars = ["CookieJar__Capacity"],
+        }).WithPipelineStepFactory(KamalPipelineStep.Create);
+        break;
 }
 
 #endregion
@@ -74,7 +75,7 @@ if (builder.ExecutionContext.IsRunMode)
 else
 {
     builder.AddDockerfile("frontend", "../frontend")
-        .WithHttpEndpoint(port: 80, targetPort: 80)
+        .WithHttpEndpoint(port: 3000, targetPort: 80)
         .WithEnvironment("SERVER_URL", server.GetEndpoint("http"))
         .WithExternalHttpEndpoints()
         .WaitFor(server);

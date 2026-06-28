@@ -38,6 +38,10 @@ dotnet run --project CookieJar.AppHost
 
 Aspire will start all resources, run database migrations, and open the dashboard automatically.
 
+## Deployment
+
+Docker Compose, Kubernetes (Helm), and Kamal deployment are covered in [deploy/README.md](deploy/README.md).
+
 ## Configuration
 
 ### RabbitMQ password (secret)
