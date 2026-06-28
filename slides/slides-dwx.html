@@ -165,7 +165,7 @@
 
     .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 13px; width: 100%; }
     .bullet-list li { display: flex; gap: 14px; align-items: flex-start; }
-    .bullet-list li::before { content: '▸'; color: var(--highlight); font-size: 18px; line-height: 1.5; flex-shrink: 0; }
+    .bullet-list li::before { content: '▸'; color: var(--highlight); font-size: 18px; line-height: 1; flex-shrink: 0; margin-top: -1px; }
 
     .arch-box {
       background: var(--slide-bg-card);
@@ -554,7 +554,7 @@
 - AppHost ist das Herzstück — definiert die gesamte Infrastruktur als Code
 - WaitFor: der Killer-Feature für lokale Dev — keine "ist die DB schon da?"-Probleme mehr
 - WithReference: nicht nur Startup-Reihenfolge, sondern auch Connection String Injection
-- Polyglot: Python braucht ein .venv, aber das ist alles
+- Tech-Stack-Unabhängigkeit: Python braucht ein .venv, aber das ist alles
 - Dashboard: zeige das live — Traces über alle Services hinweg, structured logs
   </aside>
 </section>
@@ -689,136 +689,143 @@ dotnet user-secrets <span class="kw">set</span> \
 </section>
 
 <!-- ═══════════════════════════════════════════════
-     SLIDE 7: ASPIRE CLI
+     SLIDE 7: DEPLOYMENT PART 1
 ═══════════════════════════════════════════════ -->
 <section class="slide">
-  <div class="fade-up label">Aspire CLI</div>
-  <div class="fade-up" style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
-    <h2 class="slide-title" style="margin:0;">Mehr als lokale Entwicklung</h2>
-    <span style="flex-shrink:0;padding:4px 12px;border-radius:6px;background:rgba(243,145,37,0.12);border:1px solid rgba(243,145,37,0.3);font-size:11px;font-weight:600;color:var(--text-accent);letter-spacing:0.05em;">☁️ Azure — first-class citizen, hier kein Thema</span>
-  </div>
+  <div class="fade-up label">Deployment · Teil 1</div>
+  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Azure &amp; Docker Compose</h2>
   <div class="fade-up rule"></div>
-  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;">
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <p style="font-size:16px;font-weight:700;color:var(--text-trust);">Lokal</p>
-      <pre style="font-size:13px;"><span class="cm"># Starten</span>
-aspire run  <span class="cm"># oder: aspire start</span>
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;align-items:stretch;">
 
-<span class="cm"># Dashboard direkt öffnen</span>
-aspire dashboard</pre>
-      <div class="card" style="padding:16px 20px;">
-        <ul class="bullet-list" style="gap:10px;">
-          <li style="align-items:center;"><span style="font-size:15px;color:var(--text-primary);">Gesamter Stack mit einem Befehl</span></li>
-          <li style="align-items:center;"><span style="font-size:15px;color:var(--text-primary);">Hot Reload für alle Services</span></li>
-          <li style="align-items:center;"><span style="font-size:15px;color:var(--text-primary);">Dashboard für Observability</span></li>
+    <!-- LEFT: Azure (not part of demo) -->
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <p style="font-size:14px;font-weight:700;color:var(--text-trust);">☁️ Azure — First-Class Citizen</p>
+        <span style="padding:3px 10px;border-radius:5px;background:rgba(107,190,167,0.12);border:1px solid rgba(107,190,167,0.3);font-size:10px;font-weight:700;color:var(--text-trust);letter-spacing:0.05em;">nicht Teil der Demo</span>
+      </div>
+      <pre style="font-size:12px;"><span class="cm"># Azure Developer CLI — ein Befehl reicht:</span>
+azd init  <span class="cm"># azure.yaml + Bicep generieren</span>
+azd up    <span class="cm"># Infra + App provisionieren &amp; deployen</span></pre>
+      <div class="card card-quality" style="padding:14px 18px;flex:1;">
+        <ul class="bullet-list" style="gap:9px;">
+          <li><span style="font-size:13px;">Aspire → Bicep: Container Apps, PostgreSQL Flexible Server, Service Bus</span></li>
+          <li><span style="font-size:13px;"><code>azd up</code> liest AppHost-Model — keine separate Infra-Konfiguration nötig</span></li>
+          <li><span style="font-size:13px;">Azure Key Vault für Secrets, Azure Monitor für Telemetrie</span></li>
+          <li><span style="font-size:13px;">Nicht alle Aspire-Ressourcen haben 1:1-Azure-Pendant</span></li>
         </ul>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <p style="font-size:16px;font-weight:700;color:var(--text-accent);">Deployment-Artifacts generieren</p>
-      <pre style="font-size:12px;"><span class="cm"># Docker Compose &amp; Kubernetes:</span>
-<span class="cm"># Target als Resource im AppHost registrieren,</span>
-<span class="cm"># dann einheitlich publishen:</span>
-aspire publish \
-  --output-path ./deploy/output
 
-<span class="cm"># Kamal (custom PipelineStep):</span>
-aspire publish \
-  --step <span class="str">generate-kamal-config</span> \
-  --output-path ./deploy/output</pre>
-      <div class="card card-accent" style="padding:14px 18px;">
-        <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;">
-          Gleiche AppHost-Definition — mehrere Deployment-Ziele.<br>
-          Kein <code style="color:var(--text-primary);">--output-format</code> mehr — Target ist Resource.<br>
-          Custom: <code style="color:var(--text-primary);">PipelineStep</code> + <code style="color:var(--text-primary);">WithPipelineStepFactory</code>
-        </p>
+    <!-- RIGHT: Docker Compose (Demo 1) -->
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <p style="font-size:14px;font-weight:700;color:var(--text-accent);">🐳 Docker Compose</p>
+        <span style="padding:3px 10px;border-radius:5px;background:rgba(243,145,37,0.12);border:1px solid rgba(243,145,37,0.3);font-size:10px;font-weight:700;color:var(--text-accent);letter-spacing:0.05em;">Demo 1</span>
+      </div>
+      <pre style="font-size:12px;"><span class="cm">// AppHost.cs</span>
+builder.<span class="ty">AddDockerComposeEnvironment</span>(<span class="str">"docker-compose"</span>)
+  .<span class="ty">ConfigureComposeFile</span>(compose =&gt; {
+    compose.Services[<span class="str">"messaging"</span>].Healthcheck = …;
+  });
+
+<span class="cm"># Artifacts generieren:</span>
+aspire publish --output-path ./deploy/output
+
+<span class="cm"># Starten:</span>
+docker compose -f ./deploy/output/docker-compose.yaml up</pre>
+      <div class="card" style="flex:1;padding:12px 16px;">
+        <ul class="bullet-list" style="gap:8px;">
+          <li><span style="font-size:13px;">Generiert: <code>docker-compose.yaml</code>, Dockerfiles, <code>.env</code> (leer — Secrets manuell füllen)</span></li>
+          <li><span style="font-size:13px;"><code>AddDockerfile</code> für non-.NET Container (nginx, Python, …)</span></li>
+          <li><span style="font-size:13px;"><code>ConfigureComposeFile</code>: Healthchecks &amp; Restart-Policies nachträglich ergänzen</span></li>
+        </ul>
       </div>
     </div>
+
   </div>
   <aside class="notes">
-- Kein --output-format mehr seit Aspire 9.3 — das Target wird als Resource im AppHost registriert
-- AddDockerComposeEnvironment / AddKubernetesEnvironment → aspire publish generiert Artifacts
-- Kamal: eigener PipelineStep, explizit via --step aufrufen — nicht RequiredBy(Publish)
-- Gleicher AppHost, gleicher publish-Aufruf — nur die registrierten Environments entscheiden was generiert wird
+- Azure: azd (Azure Developer CLI) liest das AppHost-Model und generiert Bicep — keine separate Infra-Definition nötig
+- Container Apps für Services, Managed PostgreSQL, Service Bus für RabbitMQ-Ersatz
+- azd up: provision + deploy in einem Schritt — kein separates aspire build
+- Docker Compose: AddDockerComposeEnvironment als Resource registrieren, dann aspire publish
+- Kein --output-format mehr seit Aspire 9.3 — Target ist Resource im AppHost
+- .env ist leer: Passwörter und Secrets manuell eintragen oder CI/CD-Secret-Store nutzen
+- ConfigureComposeFile: läuft nach der Generierung — hier Healthchecks, DependsOn-Conditions etc.
   </aside>
 </section>
 
 <!-- ═══════════════════════════════════════════════
-     SLIDE 8: DEPLOYMENT
+     SLIDE 8: DEPLOYMENT PART 2
 ═══════════════════════════════════════════════ -->
 <section class="slide">
-  <div class="fade-up label">Deployment</div>
-  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Docker Compose &amp; Custom Pipeline Steps</h2>
+  <div class="fade-up label">Deployment · Teil 2</div>
+  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Kubernetes &amp; Custom Providers</h2>
   <div class="fade-up rule"></div>
   <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%;align-items:stretch;">
 
-    <!-- LEFT: Docker Compose -->
+    <!-- LEFT: Kubernetes -->
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <p style="font-size:14px;font-weight:700;color:var(--text-trust);">🐳 Docker Compose</p>
-      <pre style="font-size:11.5px;"><span class="cm">// AppHost.cs — Environment als Resource</span>
-builder.<span class="ty">AddDockerComposeEnvironment</span>(<span class="str">"docker-compose"</span>)
-  .<span class="ty">ConfigureComposeFile</span>(compose =&gt; {
-    <span class="cm">// Post-processing: Healthchecks,</span>
-    <span class="cm">// Restart-Policies, …</span>
-    compose.Services[<span class="str">"messaging"</span>].Healthcheck
-      = <span class="kw">new</span> <span class="ty">Healthcheck</span> { … };
-  });</pre>
-      <pre style="font-size:11.5px;">aspire publish \
-  --output-path ./deploy/output
+      <div style="display:flex;align-items:center;gap:10px;">
+        <p style="font-size:14px;font-weight:700;color:var(--text-trust);">☸️ Kubernetes / Helm</p>
+        <span style="padding:3px 10px;border-radius:5px;background:rgba(107,190,167,0.12);border:1px solid rgba(107,190,167,0.3);font-size:10px;font-weight:700;color:var(--text-trust);letter-spacing:0.05em;">Demo 2 · Preview</span>
+      </div>
+      <pre style="font-size:11.5px;"><span class="cm">// AppHost.cs</span>
+builder.<span class="ty">AddKubernetesEnvironment</span>(<span class="str">"kubernetes"</span>);
 
-docker compose \
-  -f ./deploy/output/docker-compose.yaml up</pre>
-      <div class="card" style="flex:1;padding:12px 16px;">
+<span class="cm"># Helm-Chart generieren:</span>
+aspire publish --output-path ./deploy/output
+
+<span class="cm"># Deployen:</span>
+helm upgrade --install cookiejar \
+  ./deploy/output/kubernetes/</pre>
+      <div class="card card-quality" style="flex:1;padding:12px 16px;">
         <ul class="bullet-list" style="gap:8px;">
-          <li><span style="font-size:13px;">Kein <code>--output-format</code> mehr — Target ist Resource im AppHost</span></li>
-          <li><span style="font-size:13px;">Generiert: <code>docker-compose.yaml</code>, <code>.env</code> (leer!), Dockerfiles</span></li>
-          <li><span style="font-size:13px;">Images separat bauen &amp; pushen — kein <code>aspire build</code> (noch)</span></li>
-          <li><span style="font-size:13px;"><code>AddDockerfile</code> für eigene Container (z.B. nginx-Frontend)</span></li>
-          <li><span style="font-size:13px;">☸️ Kubernetes/Helm analog: <code>AddKubernetesEnvironment</code></span></li>
+          <li><span style="font-size:13px;">Generiert vollständiges Helm-Chart inkl. <code>values.yaml</code></span></li>
+          <li><span style="font-size:13px;">Accessories als Deployments — für Produktion: externe Managed Services bevorzugen</span></li>
+          <li><span style="font-size:13px; color:var(--text-accent);">⚠️ Preview-Feature — Known Issues: Ingress, TLS, Secrets nicht fertig</span></li>
+          <li><span style="font-size:13px;">Ausgabe ist Ausgangspunkt, kein produktionsfertiges Chart</span></li>
         </ul>
       </div>
     </div>
 
     <!-- RIGHT: Kamal custom PipelineStep -->
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <p style="font-size:14px;font-weight:700;color:var(--text-accent);">⚙️ Kamal — eigener PipelineStep</p>
-      <div class="card card-accent" style="padding:14px 18px;">
-        <pre style="font-size:11px;"><span class="cm">// Nur in Publish-Mode registrieren</span>
-<span class="kw">if</span> (builder.ExecutionContext.<span class="ty">IsPublishMode</span>)
-{
-  builder.<span class="ty">AddResource</span>(
-      <span class="kw">new</span> <span class="ty">KamalDeploymentResource</span>(<span class="str">"kamal"</span>))
-    .<span class="ty">WithPipelineStepFactory</span>(
-      <span class="ty">KamalPipelineStep</span>.Create);
-}</pre>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <p style="font-size:14px;font-weight:700;color:var(--text-accent);">⚙️ Custom Provider — Kamal</p>
+        <span style="padding:3px 10px;border-radius:5px;background:rgba(243,145,37,0.12);border:1px solid rgba(243,145,37,0.3);font-size:10px;font-weight:700;color:var(--text-accent);letter-spacing:0.05em;">Demo 2</span>
       </div>
-      <pre style="font-size:11.5px;"><span class="cm"># Explizit aufrufen — kein RequiredBy!</span>
-aspire publish \
-  --step <span class="str">generate-kamal-config</span> \
-  --output-path ./deploy/output
+      <pre style="font-size:10.5px;"><span class="cm">// AppHost.cs — eigenen PipelineStep registrieren</span>
+builder.<span class="ty">AddResource</span>(<span class="kw">new</span> <span class="ty">KamalDeploymentResource</span>(<span class="str">"kamal"</span>)
+  { ServiceName = <span class="str">"cookiejar"</span>, Architecture = <span class="str">"arm64"</span>,
+    ExtraSecretEnvVars = [<span class="str">"CookieJar__Capacity"</span>] })
+  .<span class="ty">WithPipelineStepFactory</span>(<span class="ty">KamalPipelineStep</span>.Create);
 
-<span class="cm"># Ausgabe: deploy.yml + .kamal/secrets</span></pre>
+<span class="cm"># Kamal-Artifacts generieren (PUBLISH_TARGET=kamal):</span>
+aspire publish --output-path ./deploy/output
+
+<span class="cm"># VM einrichten + deployen:</span>
+./deploy/kamal/3-deploy.sh all</pre>
       <div class="card" style="flex:1;padding:12px 16px;">
         <ul class="bullet-list" style="gap:8px;">
-          <li><span style="font-size:13px;">Docker auf Bare-Metal / Cloud-VMs — kein Kubernetes</span></li>
-          <li><span style="font-size:13px;"><code>PipelineStep</code> walkt das Resource-Model</span></li>
-          <li><span style="font-size:13px;"><code>RequiredBy(Publish)</code> vermeiden — läuft sonst bei jedem Publish</span></li>
-          <li><span style="font-size:13px;"><code>kamal setup &amp;&amp; kamal deploy</code></span></li>
+          <li><span style="font-size:13px;"><code>PipelineStep</code> walkt das Resource-Model: liest DB-Namen, User, Health-Check-Pfad aus Annotationen</span></li>
+          <li><span style="font-size:13px;">Generiert <code>config/deploy.yml</code> + <code>.kamal/secrets.example</code></span></li>
+          <li><span style="font-size:13px;">Kein Kubernetes nötig — SSH + Docker reicht (Bare-Metal, Cloud-VMs)</span></li>
+          <li><span style="font-size:13px;"><code>RequiredBySteps</code> statt <code>RequiredBy(Publish)</code> — läuft nur explizit</span></li>
         </ul>
       </div>
     </div>
 
   </div>
   <aside class="notes">
-- Docker Compose: kein --output-format mehr seit Aspire 9.3 — das Target wird als Resource im AppHost registriert
-- AddDockerComposeEnvironment("docker-compose") + aspire publish reicht; generiert yaml, .env (leer), Dockerfiles für non-.NET
-- ConfigureComposeFile: läuft nach der Generierung, vor dem Schreiben — hier Healthchecks, Restart-Policies etc. einbauen
-- AddDockerfile("frontend", "../frontend"): eigener nginx-Container mit Vite-Build — SERVER_URL als Env-Variable injiziert
-- Images bauen und pushen ist noch manuell (kein aspire build); für lokale Registry: dotnet publish /t:PublishContainer, docker build, docker push
-- Kubernetes analog: AddKubernetesEnvironment → Helm-Chart generiert
-- Kamal: von 37signals — "deploy anywhere, no Kubernetes", SSH + Docker reicht
-- RequiredBy(WellKnownPipelineSteps.Publish) NICHT verwenden — dann läuft Kamal bei jedem aspire publish, schreibt falsche Ausgabe
-- Stattdessen: --step generate-kamal-config explizit aufrufen
+- Kubernetes: AddKubernetesEnvironment → Helm-Chart via aspire publish — Preview seit ~13.x
+- Known Issues: Ingress-Resource fehlt, TLS nicht konfiguriert, Secrets als Plaintext in values.yaml — für Produktion nacharbeiten
+- Accessories als Deployments im Helm-Chart — für Produktion besser: externe Managed Services (RDS, ElastiCache)
+- Kamal: von 37signals (Basecamp, Hey) — "deploy anywhere, no Kubernetes needed"
+- KamalDeploymentResource: Service-Name, Architektur, extra Secrets — alles in AppHost.cs konfiguriert, nicht hardcoded im Publisher
+- PipelineStep walkt das Resource-Model: liest PostgresServerResource.UserNameParameter, EndpointProbeAnnotation für Health-Check-Pfad
+- Dockerfile-Container mit EndpointAnnotation (frontend, nginx) → HTTP-Accessory auf Port 3000; ohne Endpoint (cookie-sensor) → Worker-Accessory, kein Port, Connection Strings aus Secrets
+- RequiredBySteps = ["publish"] bedeutet: läuft MIT aspire publish — im Gegensatz zu requiredBy, das eigene Step-Namen braucht
+- 3-deploy.sh: löst ${VAR}-Platzhalter via sed auf, ruft kamal server bootstrap + proxy boot + accessory boot all + deploy --skip-push auf; gibt am Ende URLs aus
   </aside>
 </section>
 
@@ -877,44 +884,54 @@ aspire agent init
 ═══════════════════════════════════════════════ -->
 <section class="slide">
   <div class="fade-up label">Lessons Learned</div>
-  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Was Aspire kann — und was noch nicht</h2>
+  <h2 class="fade-up slide-title" style="margin-bottom:8px;">TL;DR</h2>
   <div class="fade-up rule"></div>
   <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;align-items:stretch;">
+
+    <!-- LEFT: Was funktioniert gut -->
     <div style="display:flex;flex-direction:column;gap:12px;">
-      <p style="font-size:15px;font-weight:700;color:var(--text-accent);">⚠️ Herausforderungen</p>
-      <div class="card card-accent" style="padding:16px 20px;flex:1;">
-        <ul class="bullet-list" style="gap:11px;">
-          <li><span style="font-size:14px;color:var(--text-primary);">Helm-Output ist <em>Ausgangspunkt</em>, nicht Endprodukt — Ingress &amp; TLS manuell</span></li>
-          <li><span style="font-size:14px;color:var(--text-primary);">Polyglot-Debugging: Python- &amp; Node-Services haben keinen Aspire-nativen Debugger</span></li>
-          <li><span style="font-size:14px;color:var(--text-primary);">Deployment-Features (Pipeline, Dockerfile Builder) noch experimentell</span></li>
-          <li><span style="font-size:14px;color:var(--text-primary);">Azure-Parität: nicht alle Aspire-Ressourcen haben ein 1:1-Azure-Pendant</span></li>
-        </ul>
-      </div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:12px;">
-      <p style="font-size:15px;font-weight:700;color:var(--text-quality);">✅ Bewährte Patterns</p>
+      <p style="font-size:15px;font-weight:700;color:var(--text-quality);">✅ Echter Mehrwert</p>
       <div class="card card-quality" style="padding:16px 20px;flex:1;">
         <ul class="bullet-list" style="gap:11px;">
-          <li><span style="font-size:14px;color:var(--text-primary);"><code style="color:var(--text-quality);">WaitFor</code> konsequent nutzen — nie auf Timeouts verlassen</span></li>
-          <li><span style="font-size:14px;color:var(--text-primary);">Alle Credentials als Parameter — auch lokal, auch wenn es "nur dev" ist</span></li>
-          <li><span style="font-size:14px;color:var(--text-primary);">Aspire für Orchestrierung, nicht als Application Framework</span></li>
-          <li><span style="font-size:14px;color:var(--text-primary);"><code style="color:var(--text-quality);">AddServiceDefaults()</code> in jedem Service — Observability kostet nichts</span></li>
-          <li><span style="font-size:14px;color:var(--text-primary);"><code style="color:var(--text-quality);">.WithReplicas(2)</code> — Produktionsprobleme durch Replica-Interferenz lokal nachstellen</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Lokale Entwicklung — massiver Zeitgewinn, gesamter Stack mit einem Befehl</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Tech-Stack-Unabhängigkeit: Python, Node, Dockerfile — kein .NET-Zwang</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Debugging verteilter Systeme: WaitFor, Replicas, Observability out-of-the-box</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Aspire MCP: Produktionsbugs lokal reproduzieren, Logs vergleichen — echter KI-Mehrwert</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Azure: <code style="color:var(--text-quality);">azd up</code> — First-Class-Citizen, kein Infra-Overhead</span></li>
         </ul>
       </div>
     </div>
+
+    <!-- RIGHT: Deployment-Realität -->
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <p style="font-size:15px;font-weight:700;color:var(--text-accent);">⚠️ Deployment-Realität</p>
+      <div class="card card-accent" style="padding:16px 20px;flex:1;">
+        <ul class="bullet-list" style="gap:11px;">
+          <li><span style="font-size:14px;color:var(--text-primary);">Docker Compose: verbessert sich, aber für echte Produktion noch Handarbeit (Secrets, TLS)</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Kubernetes: Preview — Helm-Output ist Ausgangspunkt, nicht Endprodukt</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Custom Provider (Kamal): machbar — aber Aufwand sollte den Nutzen rechtfertigen</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Außerhalb Azure gilt: Deployment nicht unterschätzen — Aspire allein reicht nicht</span></li>
+        </ul>
+      </div>
+      <div class="card" style="padding:12px 16px;">
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
+          <strong style="color:var(--text-primary);">Fazit:</strong> Aspire ist für lokale Entwicklung &amp; Azure klar empfehlenswert.
+          Für andere Plattformen: Augen offen — es wird besser, ist aber noch nicht da.
+        </p>
+      </div>
+    </div>
+
   </div>
   <aside class="notes">
-- Das ist die ehrliche Seite — was ich Kunden und Teams sage bevor sie Aspire einführen
-- Herausforderungen sind keine Deal-Breaker, aber man muss sie kennen
-- Patterns: WaitFor ist fast immer die richtige Antwort auf Startup-Probleme
-- "Aspire für Orchestrierung, nicht als Framework": Aspire soll verdrahten, nicht die App-Logik bestimmen
-- WithReplicas: konkretes Beispiel aus dem Demo — CookieJarService hat In-Memory-Subscriber-Liste für SSE.
-  Mit einer Instanz funktioniert alles. Mit zwei Replicas: Keks wird auf Replica A genommen,
-  DB-Update passiert, aber Broadcast geht nur an SSE-Clients die auf Replica A verbunden sind —
-  Clients auf Replica B sehen keine Live-Updates. Genau so ein Bug tritt in Produktion auf,
-  und mit .WithReplicas(2) kann man ihn lokal sofort reproduzieren und fixen (z.B. Redis Pub/Sub).
-- Fazit insgesamt: Aspire spart massiv Zeit bei lokaler Entwicklung, beim Deployment ist man noch nicht am Ziel
+- Lokale Entwicklung: massiver Zeitgewinn — gesamter Stack, Hot Reload, Observability, kein Docker-Compose-Handarbeit
+- Tech-Stack-Unabhängigkeit: Python Sensor, Node Frontend, .NET Backend — alles in einem AppHost. Kein .NET-Zwang.
+- Debugging: .WithReplicas(2) — CookieJarService SSE-Bug reproduzierbar. Replicas enthüllen Race Conditions die mit einer Instanz unsichtbar sind.
+- Aspire MCP: KI hat direkten Zugriff auf laufende Resources, Logs, Traces — nicht nur Code-Kontext. Das ist 2026 der interessanteste Trend.
+- Azure: azd up liest AppHost-Model, generiert Bicep, provisioniert Container Apps, PostgreSQL, Service Bus. Kein manuelles Infra-Wissen nötig.
+- Docker Compose: verbessert sich schnell, aber Secrets im .env sind leer, TLS manuell, kein aspire build — noch Lücken
+- Kubernetes: Preview — Ingress fehlt, Secrets als Plaintext, Accessories als Deployments (nicht produktionstauglich)
+- Custom Provider: Machbarkeitsnachweis — wer Kamal kennt und einsetzt, profitiert. Aber: echt viel Aufwand für die Integration.
+- Fazit: Aspire ist kein "deploy anywhere"-Tool. Für lokale Dev und Azure: sofort empfehlenswert. Rest: abwarten oder mitgestalten.
   </aside>
 </section>
 
@@ -974,7 +991,7 @@ aspire agent init
   <aside class="notes">
 - Zeit für Fragen lassen — das ist oft der wertvollste Teil
 - QR-Code für DWX-Feedback-App einscannen
-- Blog-Artikel verweisen: vensas.de/de/blog — Aspire-Serie mit Deployment-Limits, Architecture, Polyglot
+- Blog-Artikel verweisen: vensas.de/de/blog — Aspire-Serie mit Deployment-Limits, Architecture, Tech-Stack-Unabhängigkeit
 - Gerne auch im Nachgang per Mail oder LinkedIn
   </aside>
 </section>
