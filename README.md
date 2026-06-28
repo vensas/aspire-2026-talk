@@ -1,8 +1,20 @@
-# CookieJar Demo
+# .NET Aspire in der Praxis — DWX 2026
 
-Aspire demo application tracking the fill level of the office cookie jar in real time.
+Talk repository for **Sven Hennessen** @ [DWX Developer World 2026](https://www.developer-week.de), 30. Juni 2026.
 
-## Architecture
+> **Von lokaler Entwicklung bis zum Deployment** — Hands-on mit .NET Aspire 13.4: AppHost, Deployment-Targets, Custom Pipeline Steps, und Aspire MCP.
+
+## Repository structure
+
+| Path | What's in it |
+|---|---|
+| `slides/` | HTML slide deck (`slides-dwx.html`) — open in a browser, navigate with arrow keys, press `S` for speaker notes |
+| `src/` | The CookieJar demo application (Aspire AppHost + all services) |
+| `deploy/` | Deployment scripts and generated artifacts for Docker Compose, Kubernetes, and Kamal |
+
+## The demo — CookieJar
+
+A small distributed application that tracks the fill level of the office cookie jar in real time. It intentionally uses three languages and runtimes to demonstrate Aspire's tech-stack independence.
 
 ```mermaid
 graph LR
