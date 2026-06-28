@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 # Generates Kamal deployment artifacts via the custom KamalPipelineStep.
-# The step runs automatically as part of aspire publish (RequiredBy "publish").
 # Run from the repository root.
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OUTPUT="$ROOT/deploy/output/kamal"
 
 echo "Generating Kamal deployment artifacts..."
-aspire publish \
-  --project "$ROOT/src/CookieJar.AppHost/CookieJar.AppHost.csproj" \
+PUBLISH_TARGET=kamal aspire publish \
+  --apphost "$ROOT/src/CookieJar.AppHost/CookieJar.AppHost.csproj" \
   --step generate-kamal-config \
   --output-path "$OUTPUT"
 

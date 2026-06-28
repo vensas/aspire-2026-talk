@@ -18,8 +18,8 @@ All commands run from the repository root.
 Generates a `docker-compose.yaml` from the AppHost resource graph.
 
 ```bash
-./deploy/publish-docker.sh
-# artifacts in: deploy/output/docker-compose/
+./deploy/docker-compose/1-publish.sh   # generate artifacts → deploy/output/docker-compose/
+./deploy/docker-compose/2-deploy.sh    # docker compose up
 ```
 
 The generated `.env` file contains placeholders that must be filled before running.
@@ -100,12 +100,8 @@ docker push localhost:5001/cookiejar-frontend:latest
 
 ### Configure .env and run
 
-`publish-docker.sh` copies `deploy/.env.template` into the output directory after each publish.
+`1-publish.sh` copies `deploy/.env.template` into the output directory after each publish.
 Edit `deploy/.env.template` to change registry, passwords, or ports — it is committed to the repo.
-
-```bash
-docker compose -f deploy/output/docker-compose/docker-compose.yaml up
-```
 
 ---
 
@@ -114,11 +110,10 @@ docker compose -f deploy/output/docker-compose/docker-compose.yaml up
 Generates a Helm chart from the AppHost resource graph.
 
 ```bash
-./deploy/publish-helm.sh
-# artifacts in: deploy/output/helm/
-
-helm upgrade --install cookiejar deploy/output/helm/ \
-  --namespace cookiejar --create-namespace
+./deploy/kubernetes/1-publish.sh   # generate Helm chart → deploy/output/helm/
+./deploy/kubernetes/2-fix.sh       # patch Aspire-generated YAML (volume name dots)
+./deploy/kubernetes/3-build.sh     # build images and load into minikube
+./deploy/kubernetes/4-deploy.sh    # helm upgrade --install
 ```
 
 ---
@@ -129,8 +124,7 @@ Kamal deploys Docker containers directly to bare-metal or cloud VMs via SSH.
 No Kubernetes required.
 
 ```bash
-./deploy/publish-kamal.sh
-# artifacts in: deploy/output/kamal/
+./deploy/kamal/1-publish.sh   # generate artifacts → deploy/output/kamal/
 
 # Configure
 cp deploy/output/kamal/.kamal/secrets.example deploy/output/kamal/.kamal/secrets

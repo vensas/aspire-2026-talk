@@ -34,6 +34,7 @@ dist-ssr/
 
 # Aspire
 .aspire/
+**/aspire-output/*
 
 # OS
 .DS_Store

@@ -5,20 +5,29 @@ using CookieJar.AppHost.Publishing;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddDockerComposeEnvironment("docker-compose")
-    .ConfigureComposeFile(compose =>
-    {
-        compose.Services["messaging"].Healthcheck = new Healthcheck
-        {
-            Test = ["CMD", "rabbitmq-diagnostics", "-q", "ping"],
-            Interval = "10s",
-            Timeout = "5s",
-            Retries = 5,
-            StartPeriod = "30s",
-        };
+#region Publishing Configuration
 
-        compose.Services["cookie-sensor"].DependsOn["messaging"].Condition = "service_healthy";
-    });
+switch (Environment.GetEnvironmentVariable("PUBLISH_TARGET"))
+{
+    case "kubernetes":
+        builder.AddKubernetesEnvironment("kubernetes");
+        break;
+    case "docker-compose":
+        builder.AddDockerComposeEnvironment("docker-compose")
+            .ConfigureComposeFile(compose =>
+            {
+                compose.Services["messaging"].Healthcheck = new Healthcheck
+                {
+                    Test = ["CMD", "rabbitmq-diagnostics", "-q", "ping"],
+                    Interval = "10s",
+                    Timeout = "5s",
+                    Retries = 5,
+                    StartPeriod = "30s",
+                };
+                compose.Services["cookie-sensor"].DependsOn["messaging"].Condition = "service_healthy";
+            });
+        break;
+}
 
 // Kamal: only registered in publish mode, triggered explicitly via --step generate-kamal-config
 if (builder.ExecutionContext.IsPublishMode)
@@ -26,6 +35,8 @@ if (builder.ExecutionContext.IsPublishMode)
     builder.AddResource(new KamalDeploymentResource("kamal"))
         .WithPipelineStepFactory(KamalPipelineStep.Create);
 }
+
+#endregion
 
 var rabbitPassword = builder.AddParameter("rabbitmq-password", secret: true);
 var capacity = builder.AddParameter("cookie-jar-capacity", "100");
