@@ -313,43 +313,75 @@
 </section>
 
 <!-- ═══════════════════════════════════════════════
-     SLIDE 2: AGENDA
+     SLIDE 2: ÜBER MICH
+═══════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="fade-up label">Über mich</div>
+  <div class="fade-up" style="display:grid;grid-template-columns:210px 1fr;gap:60px;width:100%;max-width:1020px;align-items:center;margin-top:20px;">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+      <img src="avatar.png" alt="Sven Hennessen"
+           style="width:144px;height:144px;border-radius:10px;object-fit:cover;object-position:center top;border:3px solid var(--highlight);">
+      <div style="text-align:center;">
+        <p style="font-size:19px;font-weight:700;color:var(--text-primary);">Sven Hennessen</p>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:26px;">
+      <div style="display:flex;align-items:center;gap:20px;">
+        <span style="font-size:32px;line-height:1;flex-shrink:0;">🛠️</span>
+        <p style="font-size:18px;color:var(--text-primary);line-height:1.45;">Fast <strong style="color:var(--text-accent);">20 Jahre</strong> Software-Entwicklung &amp; Architektur</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <span style="font-size:32px;line-height:1;flex-shrink:0;">🏢</span>
+        <p style="font-size:18px;color:var(--text-primary);line-height:1.45;">Co-Gründer &amp; Co-Geschäftsführer <strong style="color:var(--text-accent);">vensas GmbH</strong> <span style="color:var(--text-secondary);font-size:15px;">(gegründet 2023)</span></p>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <span style="font-size:32px;line-height:1;flex-shrink:0;">🏭</span>
+        <p style="font-size:18px;color:var(--text-primary);line-height:1.45;">Beratung und Entwicklung von <strong style="color:var(--text-accent);">Unternehmenssoftware</strong> für den Mittelstand</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <span style="font-size:32px;line-height:1;flex-shrink:0;">🚴</span>
+        <p style="font-size:18px;color:var(--text-primary);line-height:1.45;">Wenn nicht am Rechner: Fahrrad fahren, Wandern oder Rennsimulator</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+- Kurze Vorstellung — nicht zu lang, das Publikum kennt das Format
+- vensas: kleines Team, fokussiert auf .NET und moderne Web-Technologien
+- Mittelstand: keine Startups, keine Konzerne — Unternehmen mit 50–500 Mitarbeitern
+- Letzter Punkt locker halten — zeigt Persönlichkeit
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 3: AGENDA
 ═══════════════════════════════════════════════ -->
 <section class="slide">
   <div class="fade-up label">Agenda</div>
-  <h2 class="fade-up slide-title" style="margin-bottom:28px;">Was erwartet euch heute?</h2>
-  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:14px 52px;width:100%;max-width:900px;">
-    <div style="display:flex;align-items:baseline;gap:14px;">
+  <h2 class="fade-up slide-title" style="margin-bottom:36px;">Was erwartet euch heute?</h2>
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:20px 64px;width:100%;max-width:920px;">
+    <div style="display:flex;align-items:baseline;gap:16px;">
       <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">1</span>
-      <span style="font-size:17px;color:var(--text-primary);">Von Tye zu .NET Aspire</span>
+      <span style="font-size:19px;color:var(--text-primary);">Geschichte</span>
     </div>
-    <div style="display:flex;align-items:baseline;gap:14px;">
-      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">5</span>
-      <span style="font-size:17px;color:var(--text-primary);">Docker Compose &amp; Kubernetes</span>
-    </div>
-    <div style="display:flex;align-items:baseline;gap:14px;">
-      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">2</span>
-      <span style="font-size:17px;color:var(--text-primary);">Demo: Die Keksdose</span>
-    </div>
-    <div style="display:flex;align-items:baseline;gap:14px;">
-      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">6</span>
-      <span style="font-size:17px;color:var(--text-primary);">Kamal — Custom Publisher</span>
-    </div>
-    <div style="display:flex;align-items:baseline;gap:14px;">
-      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">3</span>
-      <span style="font-size:17px;color:var(--text-primary);">AppHost &amp; Parameter</span>
-    </div>
-    <div style="display:flex;align-items:baseline;gap:14px;">
-      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">7</span>
-      <span style="font-size:17px;color:var(--text-primary);">Aspire MCP</span>
-    </div>
-    <div style="display:flex;align-items:baseline;gap:14px;">
+    <div style="display:flex;align-items:baseline;gap:16px;">
       <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">4</span>
-      <span style="font-size:17px;color:var(--text-primary);">Aspire CLI &amp; Deployment</span>
+      <span style="font-size:19px;color:var(--text-primary);">Aspire Deployment</span>
     </div>
-    <div style="display:flex;align-items:baseline;gap:14px;">
-      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">8</span>
-      <span style="font-size:17px;color:var(--text-primary);">Limits &amp; Lessons Learned</span>
+    <div style="display:flex;align-items:baseline;gap:16px;">
+      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">2</span>
+      <span style="font-size:19px;color:var(--text-primary);">Demo-Anwendungsfall</span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:16px;">
+      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">5</span>
+      <span style="font-size:19px;color:var(--text-primary);">Aspire &amp; KI</span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:16px;">
+      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">3</span>
+      <span style="font-size:19px;color:var(--text-primary);">Aspire Core-Features</span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:16px;">
+      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">6</span>
+      <span style="font-size:19px;color:var(--text-primary);">Limits &amp; Lessons Learned</span>
     </div>
   </div>
   <aside class="notes">
@@ -389,10 +421,9 @@
       <span style="padding:4px 12px;border-radius:4px;background:var(--color-accent);font-size:11px;font-weight:800;color:var(--color-black);letter-spacing:0.04em;">Heute · v 13.4</span>
     </div>
   </div>
-  <div class="fade-up card card-accent" style="margin-top:36px;max-width:900px;padding:18px 24px;">
+  <div class="fade-up card card-accent" style="margin-top:36px;width:100%;padding:18px 24px;">
     <p style="font-size:17px;color:var(--text-primary);line-height:1.6;">
-      Aspire hat sich von einem reinen Dev-Tool zu einer ernstzunehmenden Plattform für verteilte Systeme entwickelt —
-      <strong style="color:var(--text-accent)">das Deployment-Thema ist von Anfang an mitgedacht, aber noch nicht fertig.</strong>
+      Aspire hat sich von einem reinen Dev-Tool zu einer ernstzunehmenden Plattform für verteilte Systeme entwickelt.
     </p>
   </div>
   <aside class="notes">
@@ -485,16 +516,20 @@
     <div class="card card-quality" style="padding:18px 22px;">
       <p style="font-size:13px;font-weight:700;color:var(--text-quality);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Ein Kommando</p>
       <p style="font-size:16px;color:var(--text-primary);line-height:1.55;">
-        <code style="color:var(--text-accent);font-size:15px;">dotnet run --project AppHost</code><br>
-        <span style="color:var(--text-secondary);font-size:14px;">PostgreSQL, RabbitMQ, Python-Sensor, .NET API, React — alles startet, verbindet und wartet aufeinander.</span>
+        <code style="color:var(--text-accent);font-size:15px;">aspire run</code><br>
+        <span style="color:var(--text-secondary);font-size:13px;">PostgreSQL, RabbitMQ, Python-Sensor, .NET API, React — alles startet, verbindet und wartet aufeinander.</span>
+      </p>
+      <p style="font-size:13px;color:var(--text-secondary);margin-top:10px;">
+        Alternativ: <code style="color:var(--text-primary);font-size:12px;">dotnet run --project AppHost</code>
       </p>
     </div>
     <div class="card card-accent" style="padding:18px 22px;">
-      <p style="font-size:13px;font-weight:700;color:var(--text-accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Polyglot out of the box</p>
+      <p style="font-size:13px;font-weight:700;color:var(--text-accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Mehrere Tech-Stacks</p>
       <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
-        .NET via <code style="color:var(--text-primary);">AddProject&lt;&gt;</code><br>
+        .NET / C# via <code style="color:var(--text-primary);">AddProject&lt;&gt;</code><br>
         Python via <code style="color:var(--text-primary);">AddPythonApp</code><br>
-        React/Vite via <code style="color:var(--text-primary);">AddViteApp</code><br>
+        Node.js / TypeScript via <code style="color:var(--text-primary);">AddNpmApp</code><br>
+        React / Vite via <code style="color:var(--text-primary);">AddViteApp</code><br>
         Alles gleichwertig im AppHost.
       </p>
     </div>
@@ -510,7 +545,8 @@
       <p style="font-size:13px;font-weight:700;color:var(--text-quality);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Dashboard</p>
       <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
         Strukturierte Logs, Traces &amp; Metrics live im Browser.<br>
-        OpenTelemetry out of the box —<br>kein separates Monitoring-Setup nötig.
+        OpenTelemetry out of the box — kein separates Monitoring-Setup nötig.<br>
+        Services können <strong style="color:var(--text-primary);">mehrere Endpoints</strong> exponieren — Api, OpenApi-Dokumentation, etc. — alle klickbar im Dashboard.
       </p>
     </div>
   </div>
@@ -586,14 +622,25 @@ dotnet user-secrets <span class="kw">set</span> \
   <div class="fade-up rule" style="margin-bottom:12px;"></div>
 
   <!-- E: Dashboard — full-width banner -->
-  <div class="fade-up card" style="width:100%;padding:14px 22px;margin-bottom:12px;display:flex;align-items:center;gap:20px;border-left-color:var(--color-trust);">
-    <span style="font-size:22px;flex-shrink:0;">🖥️</span>
-    <div>
-      <h3 style="font-size:15px;font-weight:700;color:var(--text-trust);margin-bottom:4px;">Dashboard — kein externer Service</h3>
-      <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;">
-        Teil des AppHost-Prozesses. Services senden OTLP via Env-Var-konfiguriertem Endpoint direkt an den AppHost-internen Collector.
-        Daneben läuft ein <strong style="color:var(--text-primary);">gRPC-Backchannel</strong> für Ressourcenstatus, Live-Logs und Commands wie <code style="color:var(--text-primary);">aspire publish</code>.
-      </p>
+  <div class="fade-up card" style="width:100%;padding:14px 22px;margin-bottom:12px;border-left-color:var(--color-trust);">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+      <span style="font-size:20px;">🖥️</span>
+      <h3 style="font-size:15px;font-weight:700;color:var(--text-trust);">Dashboard</h3>
+      <span style="font-size:12px;color:var(--text-secondary);font-weight:400;">— läuft im AppHost-Prozess, kein separater Service</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0;flex-wrap:nowrap;">
+      <div style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--text-primary);white-space:nowrap;">Services</div>
+      <div style="display:flex;flex-direction:column;align-items:stretch;padding:0 12px;gap:4px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:14px;color:var(--text-secondary);">→</span>
+          <span style="font-size:11px;color:var(--text-secondary);">OTLP — Logs, Traces, Metrics</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:14px;color:var(--text-secondary);">⇄</span>
+          <span style="font-size:11px;color:var(--text-secondary);">gRPC (DCP) — Status, Console-Output, Commands</span>
+        </div>
+      </div>
+      <div style="background:var(--slide-bg-card);border:1px solid var(--color-trust);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--text-trust);white-space:nowrap;">AppHost</div>
     </div>
   </div>
 
@@ -602,33 +649,32 @@ dotnet user-secrets <span class="kw">set</span> \
     <div class="card card-quality" style="padding:16px 20px;">
       <h3 style="font-size:14px;font-weight:700;color:var(--text-quality);margin-bottom:8px;">🧩 Annotations-Modell</h3>
       <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
-        Alles ist ein <code style="color:var(--text-primary);">IResource</code>. Der Builder akkumuliert nur <strong style="color:var(--text-primary);">Annotations</strong>
+        Alles ist ein <code style="color:var(--text-primary);">IResource</code> mit <strong style="color:var(--text-primary);">Annotations</strong>
         (<code style="color:var(--text-primary);">ContainerImageAnnotation</code>, <code style="color:var(--text-primary);">WaitForAnnotation</code>&nbsp;…).<br>
-        <code style="color:var(--text-primary);">Build()</code> materialisiert das Modell — danach nur noch Ausführung.
+        <code style="color:var(--text-primary);">Build()</code> materialisiert das Modell.
       </p>
     </div>
     <div class="card card-accent" style="padding:16px 20px;">
-      <h3 style="font-size:14px;font-weight:700;color:var(--text-accent);margin-bottom:8px;">🔗 WithReference — Env Var Injection</h3>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-accent);margin-bottom:8px;">🔗 WithReference</h3>
       <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
-        <code style="color:var(--text-primary);">.WithReference(db)</code> hängt eine <code style="color:var(--text-primary);">EnvironmentCallbackAnnotation</code> an.<br>
-        Beim Start löst Aspire den Ausdruck auf und setzt<br>
-        <code style="color:var(--text-primary);">ConnectionStrings__&lt;name&gt;</code> — kein fixer Port im Code.
+        <code style="color:var(--text-primary);">.WithReference(db)</code> setzt beim Start<br>
+        <code style="color:var(--text-primary);">ConnectionStrings__&lt;name&gt;</code> als Env Var —<br>
+        kein fixer Port, kein Config-Boilerplate.
       </p>
     </div>
     <div class="card" style="padding:16px 20px;">
       <h3 style="font-size:14px;font-weight:700;color:var(--text-trust);margin-bottom:8px;">🔍 Service Discovery</h3>
       <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
         Aspire setzt <code style="color:var(--text-primary);">services__server__http__0=http://localhost:PORT</code>.<br>
-        <code style="color:var(--text-primary);">AddServiceDefaults()</code> registriert einen Resolver,<br>
-        der <code style="color:var(--text-primary);">IConfiguration</code> auswertet →
-        <code style="color:var(--text-primary);">http://server</code> funktioniert.
+        <code style="color:var(--text-primary);">AddServiceDefaults()</code> registriert einen Resolver —<br>
+        <code style="color:var(--text-primary);">http://server</code> funktioniert ohne Konfiguration.
       </p>
     </div>
     <div class="card card-quality" style="padding:16px 20px;">
-      <h3 style="font-size:14px;font-weight:700;color:var(--text-quality);margin-bottom:8px;">❤️ WaitFor — mehr als Port-Polling</h3>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-quality);margin-bottom:8px;">❤️ WaitFor</h3>
       <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
-        Interne State Machine: <em>Starting → Running → Healthy</em>.<br>
-        <code style="color:var(--text-primary);">.WaitFor(x)</code> blockiert bis Zielzustand erreicht,<br>
+        State Machine: <em>Starting → Running → Healthy</em>.<br>
+        <code style="color:var(--text-primary);">.WaitFor(x)</code> blockiert bis Healthy —<br>
         nicht nur bis der Port offen ist.
       </p>
     </div>
@@ -647,170 +693,132 @@ dotnet user-secrets <span class="kw">set</span> \
 ═══════════════════════════════════════════════ -->
 <section class="slide">
   <div class="fade-up label">Aspire CLI</div>
-  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Mehr als lokale Entwicklung</h2>
+  <div class="fade-up" style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
+    <h2 class="slide-title" style="margin:0;">Mehr als lokale Entwicklung</h2>
+    <span style="flex-shrink:0;padding:4px 12px;border-radius:6px;background:rgba(243,145,37,0.12);border:1px solid rgba(243,145,37,0.3);font-size:11px;font-weight:600;color:var(--text-accent);letter-spacing:0.05em;">☁️ Azure — first-class citizen, hier kein Thema</span>
+  </div>
   <div class="fade-up rule"></div>
   <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;">
     <div style="display:flex;flex-direction:column;gap:14px;">
       <p style="font-size:16px;font-weight:700;color:var(--text-trust);">Lokal</p>
       <pre style="font-size:13px;"><span class="cm"># Starten</span>
-dotnet <span class="kw">run</span> --project AppHost
+aspire run  <span class="cm"># oder: aspire start</span>
 
 <span class="cm"># Dashboard direkt öffnen</span>
 aspire dashboard</pre>
       <div class="card" style="padding:16px 20px;">
         <ul class="bullet-list" style="gap:10px;">
-          <li><span style="font-size:15px;color:var(--text-primary);">Gesamter Stack mit einem Befehl</span></li>
-          <li><span style="font-size:15px;color:var(--text-primary);">Hot Reload für alle Services</span></li>
-          <li><span style="font-size:15px;color:var(--text-primary);">Dashboard für Observability</span></li>
+          <li style="align-items:center;"><span style="font-size:15px;color:var(--text-primary);">Gesamter Stack mit einem Befehl</span></li>
+          <li style="align-items:center;"><span style="font-size:15px;color:var(--text-primary);">Hot Reload für alle Services</span></li>
+          <li style="align-items:center;"><span style="font-size:15px;color:var(--text-primary);">Dashboard für Observability</span></li>
         </ul>
       </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:14px;">
       <p style="font-size:16px;font-weight:700;color:var(--text-accent);">Deployment-Artifacts generieren</p>
-      <pre style="font-size:12px;"><span class="cm"># Docker Compose</span>
+      <pre style="font-size:12px;"><span class="cm"># Docker Compose &amp; Kubernetes:</span>
+<span class="cm"># Target als Resource im AppHost registrieren,</span>
+<span class="cm"># dann einheitlich publishen:</span>
 aspire publish \
-  --output-format <span class="str">docker-compose</span> \
-  --output-path ./deploy/docker
+  --output-path ./deploy/output
 
-<span class="cm"># Kubernetes / Helm</span>
+<span class="cm"># Kamal (custom PipelineStep):</span>
 aspire publish \
-  --output-format <span class="str">helm</span> \
-  --output-path ./deploy/helm
-
-<span class="cm"># Kamal (custom publisher)</span>
-aspire publish \
-  --output-format <span class="str">kamal</span> \
-  --output-path ./deploy/kamal</pre>
+  --step <span class="str">generate-kamal-config</span> \
+  --output-path ./deploy/output</pre>
       <div class="card card-accent" style="padding:14px 18px;">
         <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;">
-          Gleiche AppHost-Definition — drei Deployment-Ziele.<br>
-          Custom: <code style="color:var(--text-primary);">IDistributedApplicationPublisher</code>
+          Gleiche AppHost-Definition — mehrere Deployment-Ziele.<br>
+          Kein <code style="color:var(--text-primary);">--output-format</code> mehr — Target ist Resource.<br>
+          Custom: <code style="color:var(--text-primary);">PipelineStep</code> + <code style="color:var(--text-primary);">WithPipelineStepFactory</code>
         </p>
       </div>
     </div>
   </div>
   <aside class="notes">
-- CLI ist der Schlüssel: gleicher AppHost, verschiedene --output-format
-- Built-in: docker-compose, helm, kube-manifest
-- Kamal ist ein custom publisher — RegisterKeyedSingleton im AppHost
-- Zeige alle drei im Demo — aspire publish läuft durch, generiert Artifacts
+- Kein --output-format mehr seit Aspire 9.3 — das Target wird als Resource im AppHost registriert
+- AddDockerComposeEnvironment / AddKubernetesEnvironment → aspire publish generiert Artifacts
+- Kamal: eigener PipelineStep, explizit via --step aufrufen — nicht RequiredBy(Publish)
+- Gleicher AppHost, gleicher publish-Aufruf — nur die registrierten Environments entscheiden was generiert wird
   </aside>
 </section>
 
 <!-- ═══════════════════════════════════════════════
-     SLIDE 8: DEPLOYMENT — DOCKER & KUBERNETES
+     SLIDE 8: DEPLOYMENT
 ═══════════════════════════════════════════════ -->
 <section class="slide">
   <div class="fade-up label">Deployment</div>
-  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Docker Compose &amp; Kubernetes</h2>
+  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Docker Compose &amp; Custom Pipeline Steps</h2>
   <div class="fade-up rule"></div>
-  <div class="fade-up card" style="padding:12px 20px;margin-bottom:14px;border-left-color:var(--color-primary-mid);">
-    <p style="font-size:13px;color:var(--text-secondary);">
-      ℹ️ <strong style="color:var(--text-primary);">Azure</strong> ist first-class citizen in Aspire (Container Apps, AZD, Azure-Hosting-Integrationen) —
-      in diesem Vortrag fokussieren wir uns auf Docker und Kubernetes.
-    </p>
-  </div>
   <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%;align-items:stretch;">
-    <div style="display:flex;flex-direction:column;gap:12px;">
-      <p style="font-size:15px;font-weight:700;color:var(--text-trust);">🐳 Docker Compose</p>
-      <pre style="font-size:12.5px;">aspire publish \
-  --output-format <span class="str">docker-compose</span> \
-  --output-path ./deploy/docker
+
+    <!-- LEFT: Docker Compose -->
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <p style="font-size:14px;font-weight:700;color:var(--text-trust);">🐳 Docker Compose</p>
+      <pre style="font-size:11.5px;"><span class="cm">// AppHost.cs — Environment als Resource</span>
+builder.<span class="ty">AddDockerComposeEnvironment</span>(<span class="str">"docker-compose"</span>)
+  .<span class="ty">ConfigureComposeFile</span>(compose =&gt; {
+    <span class="cm">// Post-processing: Healthchecks,</span>
+    <span class="cm">// Restart-Policies, …</span>
+    compose.Services[<span class="str">"messaging"</span>].Healthcheck
+      = <span class="kw">new</span> <span class="ty">Healthcheck</span> { … };
+  });</pre>
+      <pre style="font-size:11.5px;">aspire publish \
+  --output-path ./deploy/output
 
 docker compose \
-  -f ./deploy/docker/docker-compose.yml \
-  up --build</pre>
-      <div class="card" style="flex:1;padding:14px 18px;">
-        <ul class="bullet-list" style="gap:9px;">
-          <li><span style="font-size:14px;">docker-compose.yml mit allen Services</span></li>
-          <li><span style="font-size:14px;">Volumes &amp; Networking generiert</span></li>
-          <li><span style="font-size:14px;">Gut für: Single-Server, Staging</span></li>
-          <li><span style="font-size:14px;">Image-Push zu Registry unterstützt</span></li>
+  -f ./deploy/output/docker-compose.yaml up</pre>
+      <div class="card" style="flex:1;padding:12px 16px;">
+        <ul class="bullet-list" style="gap:8px;">
+          <li><span style="font-size:13px;">Kein <code>--output-format</code> mehr — Target ist Resource im AppHost</span></li>
+          <li><span style="font-size:13px;">Generiert: <code>docker-compose.yaml</code>, <code>.env</code> (leer!), Dockerfiles</span></li>
+          <li><span style="font-size:13px;">Images separat bauen &amp; pushen — kein <code>aspire build</code> (noch)</span></li>
+          <li><span style="font-size:13px;"><code>AddDockerfile</code> für eigene Container (z.B. nginx-Frontend)</span></li>
+          <li><span style="font-size:13px;">☸️ Kubernetes/Helm analog: <code>AddKubernetesEnvironment</code></span></li>
         </ul>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:12px;">
-      <p style="font-size:15px;font-weight:700;color:var(--text-quality);">☸️ Kubernetes / Helm</p>
-      <pre style="font-size:12.5px;">aspire publish \
-  --output-format <span class="str">helm</span> \
-  --output-path ./deploy/helm
 
-helm upgrade --install cookiejar \
-  ./deploy/helm -n cookiejar</pre>
-      <div class="card card-quality" style="flex:1;padding:14px 18px;">
-        <ul class="bullet-list" style="gap:9px;">
-          <li><span style="font-size:14px;">Helm Chart mit Deployments, Services</span></li>
-          <li><span style="font-size:14px;">ConfigMaps &amp; Secrets generiert</span></li>
-          <li><span style="font-size:14px;"><code style="color:var(--text-quality);">aspire deploy --list-steps</code> (experimentell)</span></li>
-          <li><span style="font-size:14px;">Ingress: manuell nötig</span></li>
-        </ul>
+    <!-- RIGHT: Kamal custom PipelineStep -->
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <p style="font-size:14px;font-weight:700;color:var(--text-accent);">⚙️ Kamal — eigener PipelineStep</p>
+      <div class="card card-accent" style="padding:14px 18px;">
+        <pre style="font-size:11px;"><span class="cm">// Nur in Publish-Mode registrieren</span>
+<span class="kw">if</span> (builder.ExecutionContext.<span class="ty">IsPublishMode</span>)
+{
+  builder.<span class="ty">AddResource</span>(
+      <span class="kw">new</span> <span class="ty">KamalDeploymentResource</span>(<span class="str">"kamal"</span>))
+    .<span class="ty">WithPipelineStepFactory</span>(
+      <span class="ty">KamalPipelineStep</span>.Create);
+}</pre>
       </div>
-    </div>
-  </div>
-  <aside class="notes">
-- Azure nicht vergessen zu erwähnen: azd up, Container Apps, Azure-Hosting — aber nicht Thema heute
-- Docker Compose: vollständig generiert — Services, Volumes, Networking, .env-Datei
-- Helm: guter Ausgangspunkt, Ingress und TLS muss man selbst konfigurieren
-- aspire deploy: Pipeline-basiert, experimentell in 13 — zeige --list-steps wenn Zeit
-- Beide Targets kommen aus der gleichen AppHost-Definition — das ist der Kernwert
-  </aside>
-</section>
-
-<!-- ═══════════════════════════════════════════════
-     SLIDE 9: KAMAL — CUSTOM PUBLISHER
-═══════════════════════════════════════════════ -->
-<section class="slide">
-  <div class="fade-up label">Custom Deployment Adapter</div>
-  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Kamal — eigener Publisher</h2>
-  <div class="fade-up rule"></div>
-  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%;align-items:stretch;">
-    <div style="display:flex;flex-direction:column;gap:12px;">
-      <div class="card" style="padding:16px 20px;">
-        <p style="font-size:13px;font-weight:700;color:var(--text-trust);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">Was ist Kamal?</p>
-        <ul class="bullet-list" style="gap:9px;">
-          <li><span style="font-size:14px;">Docker auf Bare-Metal oder Cloud-VMs</span></li>
-          <li><span style="font-size:14px;">Kein Kubernetes — SSH + Docker reicht</span></li>
-          <li><span style="font-size:14px;">Zero-downtime Deploy, Rolling Restart</span></li>
-          <li><span style="font-size:14px;"><code style="color:var(--text-primary);">kamal setup &amp;&amp; kamal deploy</code></span></li>
-        </ul>
-      </div>
-      <pre style="font-size:12px;"><span class="cm"># Generieren</span>
+      <pre style="font-size:11.5px;"><span class="cm"># Explizit aufrufen — kein RequiredBy!</span>
 aspire publish \
-  --output-path ./deploy/kamal
+  --step <span class="str">generate-kamal-config</span> \
+  --output-path ./deploy/output
 
-<span class="cm"># Ausgabe:</span>
-<span class="cm">#   deploy.yml</span>
-<span class="cm">#   .kamal/secrets.example</span></pre>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:12px;">
-      <div class="card card-accent" style="padding:16px 20px;">
-        <p style="font-size:13px;font-weight:700;color:var(--text-accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">PipelineStep implementieren</p>
-        <pre style="font-size:11.5px;"><span class="kw">var</span> step = <span class="kw">new</span> <span class="ty">PipelineStep</span> {
-  Name = <span class="str">"generate-kamal-config"</span>,
-  Action = <span class="kw">async</span> ctx =&gt; {
-    <span class="kw">var</span> output = ctx.<span class="ty">Services</span>
-      .GetRequiredService&lt;
-        <span class="ty">IPipelineOutputService</span>&gt;();
-    <span class="cm">// Generiert deploy.yml + .kamal/secrets</span>
-  }
-};
-step.<span class="ty">RequiredBy</span>(
-  <span class="ty">WellKnownPipelineSteps</span>.Publish);</pre>
+<span class="cm"># Ausgabe: deploy.yml + .kamal/secrets</span></pre>
+      <div class="card" style="flex:1;padding:12px 16px;">
+        <ul class="bullet-list" style="gap:8px;">
+          <li><span style="font-size:13px;">Docker auf Bare-Metal / Cloud-VMs — kein Kubernetes</span></li>
+          <li><span style="font-size:13px;"><code>PipelineStep</code> walkt das Resource-Model</span></li>
+          <li><span style="font-size:13px;"><code>RequiredBy(Publish)</code> vermeiden — läuft sonst bei jedem Publish</span></li>
+          <li><span style="font-size:13px;"><code>kamal setup &amp;&amp; kamal deploy</code></span></li>
+        </ul>
       </div>
-      <pre style="font-size:12px;"><span class="cm">// In AppHost.cs registrieren:</span>
-builder.<span class="ty">AddResource</span>(
-    <span class="kw">new</span> <span class="ty">KamalDeploymentResource</span>(<span class="str">"kamal"</span>))
-  .<span class="ty">WithPipelineStepFactory</span>(
-    <span class="ty">KamalPipelineStep</span>.Create);</pre>
     </div>
+
   </div>
   <aside class="notes">
-- Kamal: von 37signals (Basecamp/Rails) — "deploy anywhere, no Kubernetes"
-- PipelineStep statt IDistributedApplicationPublisher — neues API in Aspire 13 (noch experimental)
-- Step walks the resource model: PostgresServerResource → Kamal accessory, ProjectResource → main service
-- IPipelineOutputService liefert den Output-Pfad — kein IOptions<PublishingOptions> mehr nötig
-- RequiredBy(WellKnownPipelineSteps.Publish): Step läuft automatisch bei aspire publish
-- Output zeigen: deploy.yml + .kamal/secrets.example
+- Docker Compose: kein --output-format mehr seit Aspire 9.3 — das Target wird als Resource im AppHost registriert
+- AddDockerComposeEnvironment("docker-compose") + aspire publish reicht; generiert yaml, .env (leer), Dockerfiles für non-.NET
+- ConfigureComposeFile: läuft nach der Generierung, vor dem Schreiben — hier Healthchecks, Restart-Policies etc. einbauen
+- AddDockerfile("frontend", "../frontend"): eigener nginx-Container mit Vite-Build — SERVER_URL als Env-Variable injiziert
+- Images bauen und pushen ist noch manuell (kein aspire build); für lokale Registry: dotnet publish /t:PublishContainer, docker build, docker push
+- Kubernetes analog: AddKubernetesEnvironment → Helm-Chart generiert
+- Kamal: von 37signals — "deploy anywhere, no Kubernetes", SSH + Docker reicht
+- RequiredBy(WellKnownPipelineSteps.Publish) NICHT verwenden — dann läuft Kamal bei jedem aspire publish, schreibt falsche Ausgabe
+- Stattdessen: --step generate-kamal-config explizit aufrufen
   </aside>
 </section>
 
@@ -1066,10 +1074,6 @@ footer{background:#1a1e2a;padding:10px 24px;font-size:11px;color:#6b7280;border-
     if (['ArrowLeft','ArrowUp'].includes(e.key)) { e.preventDefault(); show(current - 1); }
   });
 
-  document.getElementById('deck').addEventListener('click', e => {
-    if (e.target.closest('a')) return;
-    show(current + 1);
-  });
 
 document.querySelectorAll('a[href]').forEach(a => a.target = '_blank');
   const initial = Math.min(parseInt(location.hash.slice(1)) - 1 || 0, slides.length - 1);

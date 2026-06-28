@@ -46,3 +46,6 @@ Thumbs.db
 
 # Playwright MCP
 .playwright-mcp
+
+# Deployment artifacts
+deploy/output
