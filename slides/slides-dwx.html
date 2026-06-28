@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>.NET Aspire in der Praxis — DWX 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; color: inherit; }
+
+    :root {
+      --color-primary:       #2c3341;
+      --color-primary-mid:   #9b99a4;
+      --color-primary-light: #cac8cf;
+      --color-accent:        #f39125;
+      --color-accent-mid:    #f4a146;
+      --color-accent-light:  #fcd5ac;
+      --color-quality:       #7bffc5;
+      --color-trust:         #6abea7;
+      --color-white:  #ffffff;
+      --color-black:  #0a0b0d;
+      --color-gray-1: #f4f4f5;
+      --color-gray-2: #e4e4e7;
+      --color-gray-3: #a1a1aa;
+    }
+
+    body.theme-dark {
+      --slide-bg:       var(--color-primary);
+      --slide-bg-card:  rgba(255,255,255,0.07);
+      --slide-border:   rgba(255,255,255,0.12);
+      --text-primary:   #ffffff;
+      --text-secondary: var(--color-primary-light);
+      --highlight:      var(--color-accent);
+      --highlight-soft: var(--color-accent-light);
+      --text-accent:    var(--color-accent);
+      --text-quality:   var(--color-quality);
+      --text-trust:     var(--color-trust);
+    }
+
+    body.theme-light {
+      --slide-bg:       var(--color-white);
+      --slide-bg-card:  var(--color-gray-1);
+      --slide-border:   var(--color-gray-2);
+      --text-primary:   var(--color-primary);
+      --text-secondary: rgba(44,51,65,0.70);
+      --highlight:      var(--color-accent);
+      --highlight-soft: var(--color-accent-light);
+      --text-accent:    var(--color-primary);
+      --text-quality:   var(--color-primary);
+      --text-trust:     var(--color-primary);
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--color-black);
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .deck { width: 100%; height: 100%; position: relative; overflow: hidden; }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 56px 80px;
+      background: var(--slide-bg);
+      color: var(--text-primary);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: all; }
+
+    .slide.active .fade-up { animation: fadeUp 0.5s ease both; }
+    .slide.active .fade-up:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .fade-up:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .fade-up:nth-child(4) { animation-delay: 0.24s; }
+    .slide.active .fade-up:nth-child(5) { animation-delay: 0.32s; }
+    .slide.active .fade-up:nth-child(6) { animation-delay: 0.40s; }
+    .slide.active .fade-up:nth-child(7) { animation-delay: 0.48s; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-accent);
+    }
+
+    .slide-title {
+      font-size: 46px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--text-primary);
+    }
+
+    .slide-subtitle {
+      font-size: 21px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-top: 14px;
+    }
+
+    .rule {
+      width: 48px;
+      height: 4px;
+      background: var(--highlight);
+      border-radius: 2px;
+      margin-bottom: 22px;
+    }
+
+    .card {
+      background: var(--slide-bg-card);
+      border: 1px solid var(--slide-border);
+      border-left: 4px solid var(--color-trust);
+      border-radius: 14px;
+      padding: 24px 28px;
+    }
+
+    .card-accent { border-left-color: var(--color-accent); }
+    .card-quality { border-left-color: var(--color-quality); }
+
+    .progress {
+      position: fixed; bottom: 0; left: 0;
+      height: 3px; background: var(--highlight);
+      transition: width 0.4s ease; z-index: 100;
+    }
+
+    .counter {
+      position: fixed; bottom: 14px; right: 24px;
+      font-size: 12px; font-weight: 500;
+      color: var(--text-secondary); z-index: 100;
+    }
+
+    .notes { display: none; }
+
+    /* ── Slide-specific helpers ── */
+    pre {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid var(--slide-border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 13.5px;
+      line-height: 1.65;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      overflow-x: auto;
+      color: var(--text-primary);
+      width: 100%;
+    }
+    .kw  { color: var(--text-accent); }
+    .ty  { color: var(--text-quality); }
+    .str { color: var(--text-trust); }
+    .cm  { color: var(--text-secondary); }
+
+    .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 13px; width: 100%; }
+    .bullet-list li { display: flex; gap: 14px; align-items: flex-start; }
+    .bullet-list li::before { content: '▸'; color: var(--highlight); font-size: 18px; line-height: 1.5; flex-shrink: 0; }
+
+    .arch-box {
+      background: var(--slide-bg-card);
+      border: 1px solid var(--slide-border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-width: 130px;
+    }
+    .arch-box .arch-emoji { font-size: 26px; line-height: 1; }
+    .arch-box .arch-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .arch-box .arch-tech { font-size: 11px; color: var(--text-secondary); }
+    .arch-arrow-h {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      color: var(--text-secondary); font-size: 11px; min-width: 60px;
+    }
+    .arch-arrow-h::before {
+      content: ''; display: block; width: 48px; height: 2px;
+      background: var(--slide-border); position: relative;
+    }
+    .arch-arrow-h::after {
+      content: '›'; font-size: 22px; color: var(--text-secondary);
+      margin-top: -18px; margin-left: 36px; line-height: 1;
+    }
+    .arch-arrow-v {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      color: var(--text-secondary); font-size: 11px; padding: 4px 0;
+    }
+    .arch-arrow-v::before {
+      content: ''; display: block; width: 2px; height: 28px;
+      background: var(--slide-border);
+    }
+    .arch-arrow-v::after { content: '↓'; font-size: 16px; color: var(--text-secondary); }
+
+    .check { color: var(--text-quality); font-size: 17px; }
+    .warn  { color: var(--text-accent);  font-size: 17px; }
+
+    .contact-row { display: flex; align-items: center; gap: 10px; font-size: 16px; }
+    .contact-icon { font-size: 18px; flex-shrink: 0; }
+    .contact-link { color: var(--text-primary); text-decoration: none; border-bottom: 1px solid var(--slide-border); }
+
+    .qr-placeholder {
+      width: 160px; height: 160px;
+      border: 2px dashed var(--slide-border);
+      border-radius: 12px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      font-size: 12px; text-align: center;
+    }
+    .qr-placeholder .qr-icon { font-size: 40px; }
+
+    @page { size: 960pt 540pt; margin: 0; }
+
+    @media print {
+      *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      body {
+        overflow: visible;
+        width: 100vw;
+        height: auto;
+        background: var(--color-black);
+      }
+
+      .deck {
+        position: static !important;
+        width: 100vw;
+        height: auto;
+        overflow: visible;
+      }
+
+      .slide {
+        position: relative !important;
+        opacity: 1 !important;
+        pointer-events: none;
+        display: flex !important;
+        width: 100vw;
+        height: 100vh;
+        page-break-after: always;
+        break-after: page;
+        break-inside: avoid;
+      }
+
+      .slide .fade-up {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+
+      .progress, .counter { display: none !important; }
+      .notes { display: none !important; }
+    }
+  </style>
+</head>
+<body class="theme-dark">
+<div class="deck" id="deck">
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 1: COVER
+═══════════════════════════════════════════════ -->
+<section class="slide slide-cover">
+  <div class="fade-up label">DWX Developer World 2026 · 30. Juni 2026</div>
+  <h1 class="fade-up" style="font-size:68px;font-weight:900;line-height:1.05;color:var(--text-primary);margin-top:20px;max-width:860px;">
+    <span style="color:var(--text-trust)">(</span>.NET<span style="color:var(--text-trust)">)</span> Aspire<br><span style="color:var(--text-accent)">in der Praxis</span>
+  </h1>
+  <p class="fade-up" style="font-size:26px;font-weight:400;color:var(--text-secondary);margin-top:18px;max-width:660px;">
+    Von lokaler Entwicklung bis zum Deployment
+  </p>
+  <div class="fade-up" style="margin-top:48px;display:flex;align-items:center;gap:16px;">
+    <img src="avatar.png" alt="Sven Hennessen"
+         style="width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:center top;flex-shrink:0;border:2px solid var(--highlight);">
+    <div>
+      <p style="font-size:17px;font-weight:700;color:var(--text-primary);">Sven Hennessen</p>
+      <p style="font-size:14px;color:var(--text-secondary);">vensas GmbH</p>
+    </div>
+  </div>
+  <div style="position:absolute;bottom:0;right:0;width:340px;height:5px;background:var(--highlight);"></div>
+  <div style="position:absolute;bottom:28px;right:48px;opacity:0.8;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1698.32 274.41" style="height:26px;width:auto;display:block;" aria-label="vensas">
+      <style>.vl{fill:#fff;stroke-width:0}</style>
+      <polygon class="vl" points="0 0 41.73 72.25 62.09 107.51 137.34 237.88 158.43 274.41 243.38 274.41 200.93 200.89 126.68 72.34 84.95 0 0 0"/>
+      <path class="vl" d="M221.91,164.48l-21.02,36.38h84.38s55.51-95.25,55.51-95.25l12.78-21.92c1.93-3.31,1.94-7.39.02-10.71L314.53,5.33C312.62,2.03,309.1,0,305.29,0h-137.46s-40.83,72.34-40.83,72.34h148.15s-53.25,92.14-53.25,92.14Z"/>
+      <path class="vl" d="M547.97,36.1h55.88l-69.48,202.2h-62.87l-69.49-202.2h55.89l44.85,145.22,45.22-145.22Z"/>
+      <path class="vl" d="M713.41,31.69c33.09,0,59.25,11.39,78.49,34.19,19.24,22.79,27.51,51.1,24.82,84.93h-155.15c1.71,15.69,7.36,27.7,16.91,36.03,9.56,8.34,21.44,12.5,35.66,12.5,10.29,0,19.48-2.26,27.57-6.8,8.09-4.53,13.85-10.72,17.28-18.57h54.41c-7.11,22.8-19.61,39.95-37.5,51.47-17.89,11.52-38.36,17.28-61.4,17.28-31.37,0-56.98-9.93-76.84-29.78-19.86-19.86-29.78-44.98-29.78-75.37s9.92-55.64,29.78-75.74c19.86-20.09,45.1-30.14,75.74-30.14ZM713.05,75.07c-12.5,0-22.92,3.37-31.25,10.11-8.34,6.75-14.22,15.75-17.65,27.02h96.69c-2.94-11.27-8.58-20.28-16.91-27.02-8.34-6.74-18.63-10.11-30.88-10.11Z"/>
+      <path class="vl" d="M960.47,31.69c22.79,0,40.68,7.11,53.67,21.32,12.99,14.21,19.49,33.7,19.49,58.46v126.84h-52.57v-115.44c0-13.73-2.94-24.02-8.82-30.89-5.88-6.86-15.57-10.29-29.04-10.29-30.4,0-45.59,16.79-45.59,50.37v106.25h-52.57V36.1h52.57v27.57c15.19-21.32,36.15-31.98,62.87-31.98Z"/>
+      <path class="vl" d="M1159.73,242.72c-27.21,0-49.88-6.3-68.01-18.93-18.14-12.62-29.04-29.96-32.72-52.02h53.31c4.41,18.14,20.71,27.21,48.9,27.21,22.79,0,34.19-5.52,34.19-16.54,0-1.47-.18-2.82-.55-4.04-.37-1.23-.98-2.33-1.84-3.31-.86-.98-1.78-1.89-2.76-2.75-.98-.86-2.39-1.66-4.23-2.39-1.84-.73-3.49-1.34-4.96-1.84-1.47-.49-3.62-1.1-6.43-1.84-2.82-.74-5.27-1.35-7.36-1.84-2.08-.49-4.96-1.1-8.64-1.84-3.68-.73-6.86-1.47-9.56-2.2-30.15-7.11-51.17-14.89-63.05-23.35-11.89-8.46-17.83-21.14-17.83-38.05,0-21.07,8.02-37.55,24.08-49.45,16.05-11.88,37.56-17.83,64.52-17.83s47.91,5.82,62.87,17.46c14.95,11.64,24.27,27.39,27.94,47.25h-53.31c-4.41-13.73-17.52-20.59-39.34-20.59s-33.83,5.64-33.83,16.91c0,4.41,2.33,7.6,6.99,9.56,4.65,1.96,15.19,4.78,31.62,8.46,16.42,3.68,29.41,7.05,38.97,10.11,9.56,3.07,18.62,7.05,27.2,11.95,8.58,4.91,14.71,10.79,18.38,17.64,3.68,6.87,5.52,15.2,5.52,25,0,21.82-8.45,38.48-25.37,50-16.91,11.52-38.48,17.28-64.71,17.28Z"/>
+      <path class="vl" d="M1427.74,36.1h52.57l-.37,202.2h-52.57v-27.21c-15.44,21.08-36.52,31.62-63.24,31.62s-48.78-9.86-66.17-29.59c-17.41-19.73-26.1-45.04-26.1-75.92s8.76-56.19,26.28-75.92c17.52-19.72,39.39-29.59,65.62-29.59s48.28,10.91,63.97,32.72v-28.31ZM1375.9,192.72c14.95,0,27.33-5.14,37.13-15.44,9.8-10.29,14.71-23.65,14.71-40.07s-4.91-29.78-14.71-40.07c-9.8-10.29-22.18-15.44-37.13-15.44s-27.21,5.15-36.76,15.44c-9.56,10.29-14.34,23.66-14.34,40.07s4.84,29.78,14.52,40.07c9.68,10.3,21.87,15.44,36.58,15.44Z"/>
+      <path class="vl" d="M1608.25,242.72c-27.21,0-49.88-6.3-68.01-18.93-18.14-12.62-29.04-29.96-32.72-52.02h53.31c4.41,18.14,20.71,27.21,48.9,27.21,22.79,0,34.19-5.52,34.19-16.54,0-1.47-.18-2.82-.55-4.04-.37-1.23-.98-2.33-1.84-3.31-.86-.98-1.78-1.89-2.76-2.75-.98-.86-2.39-1.66-4.23-2.39-1.84-.73-3.49-1.34-4.96-1.84-1.47-.49-3.62-1.1-6.43-1.84-2.82-.74-5.27-1.35-7.35-1.84-2.09-.49-4.96-1.1-8.64-1.84-3.68-.73-6.87-1.47-9.56-2.2-30.15-7.11-51.17-14.89-63.05-23.35-11.89-8.46-17.83-21.14-17.83-38.05,0-21.07,8.03-37.55,24.08-49.45,16.05-11.88,37.56-17.83,64.52-17.83s47.92,5.82,62.87,17.46c14.94,11.64,24.26,27.39,27.94,47.25h-53.31c-4.41-13.73-17.52-20.59-39.34-20.59s-33.82,5.64-33.82,16.91c0,4.41,2.32,7.6,6.98,9.56,4.65,1.96,15.19,4.78,31.62,8.46,16.42,3.68,29.41,7.05,38.97,10.11,9.56,3.07,18.62,7.05,27.21,11.95,8.57,4.91,14.7,10.79,18.38,17.64,3.68,6.87,5.51,15.2,5.51,25,0,21.82-8.45,38.48-25.37,50-16.91,11.52-38.48,17.28-64.71,17.28Z"/>
+    </svg>
+  </div>
+  <aside class="notes">
+- Kurze Vorstellung: Sven Hennessen, vensas GmbH — wir bauen verteilte .NET-Systeme für Kunden
+- Dieser Vortrag: konkrete Erfahrungen, kein Marketing — was funktioniert, was nicht
+- Aspire 13.4 ist die Basis, NET 10
+- DWX 2026 — freue mich auf Fragen am Ende
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 2: AGENDA
+═══════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="fade-up label">Agenda</div>
+  <h2 class="fade-up slide-title" style="margin-bottom:28px;">Was erwartet euch heute?</h2>
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:14px 52px;width:100%;max-width:900px;">
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">1</span>
+      <span style="font-size:17px;color:var(--text-primary);">Von Tye zu .NET Aspire</span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">5</span>
+      <span style="font-size:17px;color:var(--text-primary);">Docker Compose &amp; Kubernetes</span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">2</span>
+      <span style="font-size:17px;color:var(--text-primary);">Demo: Die Keksdose</span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">6</span>
+      <span style="font-size:17px;color:var(--text-primary);">Kamal — Custom Publisher</span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">3</span>
+      <span style="font-size:17px;color:var(--text-primary);">AppHost &amp; Parameter</span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">7</span>
+      <span style="font-size:17px;color:var(--text-primary);">Aspire MCP</span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">4</span>
+      <span style="font-size:17px;color:var(--text-primary);">Aspire CLI &amp; Deployment</span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span style="font-size:13px;font-weight:700;color:var(--text-accent);min-width:20px;">8</span>
+      <span style="font-size:17px;color:var(--text-primary);">Limits &amp; Lessons Learned</span>
+    </div>
+  </div>
+  <aside class="notes">
+- Kurzer Überblick — keine Details hier, nur orientieren
+- Demo zieht sich durch die meisten Punkte: Keksdose ist der rote Faden
+- Deployment ist der Schwerpunkt des zweiten Teils
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 3: GESCHICHTE
+═══════════════════════════════════════════════ -->
+<section class="slide slide-timeline">
+  <div class="fade-up label">Hintergrund</div>
+  <h2 class="fade-up slide-title" style="margin-bottom:40px;">Von Tye zu .NET Aspire</h2>
+  <div class="fade-up" style="position:relative;display:flex;align-items:flex-start;gap:0;width:100%;max-width:1100px;">
+    <div style="position:absolute;top:22px;left:22px;right:22px;height:2px;background:var(--slide-border);z-index:0;"></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;z-index:1;">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--slide-bg-card);border:2px solid var(--slide-border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text-secondary);">19</div>
+      <p style="font-size:14px;font-weight:700;color:var(--text-secondary);text-align:center;">Project Tye</p>
+      <p style="font-size:12px;color:var(--text-secondary);text-align:center;line-height:1.5;">Microsoft Labs<br>Experimentell</p>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;z-index:1;">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--slide-bg-card);border:2px solid var(--slide-border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text-secondary);">23</div>
+      <p style="font-size:14px;font-weight:700;color:var(--text-secondary);text-align:center;">.NET Aspire Preview</p>
+      <p style="font-size:12px;color:var(--text-secondary);text-align:center;line-height:1.5;">Build 2023<br>Dev-Tooling-Fokus</p>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;z-index:1;">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--slide-bg-card);border:2px solid var(--slide-border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text-secondary);">24</div>
+      <p style="font-size:14px;font-weight:700;color:var(--text-secondary);text-align:center;">Aspire GA</p>
+      <p style="font-size:12px;color:var(--text-secondary);text-align:center;line-height:1.5;">Mai 2024, .NET 8<br>Stabile API</p>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;z-index:1;">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--color-accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--color-black);">25</div>
+      <p style="font-size:14px;font-weight:700;color:var(--text-primary);text-align:center;">Aspire eigenständig</p>
+      <p style="font-size:12px;color:var(--text-secondary);text-align:center;line-height:1.5;">Kein .NET-Lock-in<br>eigene Versionierung</p>
+      <span style="padding:4px 12px;border-radius:4px;background:var(--color-accent);font-size:11px;font-weight:800;color:var(--color-black);letter-spacing:0.04em;">Heute · v 13.4</span>
+    </div>
+  </div>
+  <div class="fade-up card card-accent" style="margin-top:36px;max-width:900px;padding:18px 24px;">
+    <p style="font-size:17px;color:var(--text-primary);line-height:1.6;">
+      Aspire hat sich von einem reinen Dev-Tool zu einer ernstzunehmenden Plattform für verteilte Systeme entwickelt —
+      <strong style="color:var(--text-accent)">das Deployment-Thema ist von Anfang an mitgedacht, aber noch nicht fertig.</strong>
+    </p>
+  </div>
+  <aside class="notes">
+- Tye war das Experiment — hat gezeigt was möglich ist
+- Aspire Preview: viel Buzz, aber noch nicht produktionsreif
+- GA: erste Projekte in Prod, wir bei vensas auch dabei
+- Eigenständig ab 2025: nicht mehr an .NET-Release-Zyklus gebunden
+- 13.4: das ist die Version heute — solide, aber noch Ecken und Kanten bei Deployment
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 3: DEMO ARCHITEKTUR
+═══════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="fade-up label">Demo</div>
+  <h2 class="fade-up slide-title" style="margin-bottom:32px;">🍪 Die Keksdose — Demo-Architektur</h2>
+  <div class="fade-up" style="position:relative;border:1px dashed var(--slide-border);border-radius:16px;padding:28px 32px;width:100%;max-width:1060px;">
+    <div style="position:absolute;top:-13px;left:20px;background:var(--slide-bg);padding:0 10px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-accent);">Aspire AppHost</div>
+    <!-- Top row: main data flow -->
+    <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
+      <div class="arch-box" style="border-left:3px solid var(--color-quality);">
+        <span class="arch-emoji">🐍</span>
+        <span class="arch-name">cookie-sensor</span>
+        <span class="arch-tech">Python + pika</span>
+      </div>
+      <div class="arch-arrow-h"><span style="font-size:11px;color:var(--text-secondary);">cookie-taken</span></div>
+      <div class="arch-box" style="border-left:3px solid var(--color-accent);">
+        <span class="arch-emoji">🐇</span>
+        <span class="arch-name">RabbitMQ</span>
+        <span class="arch-tech">Message Broker</span>
+      </div>
+      <div class="arch-arrow-h"><span style="font-size:11px;color:var(--text-secondary);">consume</span></div>
+      <div class="arch-box" style="border-left:3px solid var(--color-trust);border-right:3px solid var(--color-trust);">
+        <span class="arch-emoji">⚙️</span>
+        <span class="arch-name">ASP.NET Server</span>
+        <span class="arch-tech">.NET + EF Core</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:64px;">
+        <span style="font-size:11px;color:var(--text-secondary);">SSE</span>
+        <span style="font-size:22px;color:var(--text-secondary);">⇄</span>
+        <span style="font-size:11px;color:var(--text-secondary);">POST /refill</span>
+      </div>
+      <div class="arch-box" style="border-left:3px solid var(--color-quality);">
+        <span class="arch-emoji">⚛️</span>
+        <span class="arch-name">React</span>
+        <span class="arch-tech">Vite Frontend</span>
+      </div>
+    </div>
+    <!-- Vertical connector + bottom row -->
+    <div style="display:flex;justify-content:center;margin-top:4px;padding-left:370px;">
+      <div class="arch-arrow-v"><span style="font-size:11px;color:var(--text-secondary);">EF Core</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-top:0;padding-left:370px;">
+      <div class="arch-box" style="border-left:3px solid var(--color-trust);">
+        <span class="arch-emoji">🐘</span>
+        <span class="arch-name">PostgreSQL</span>
+        <span class="arch-tech">Persistenz</span>
+      </div>
+      <div style="min-width:48px;text-align:center;color:var(--text-secondary);font-size:20px;">←</div>
+      <div class="arch-box" style="border-left:3px solid var(--slide-border);">
+        <span class="arch-emoji">🔧</span>
+        <span class="arch-name">PgAdmin</span>
+        <span class="arch-tech">Admin UI</span>
+      </div>
+    </div>
+  </div>
+  <div class="fade-up" style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
+    <span style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:20px;padding:6px 14px;font-size:13px;color:var(--text-secondary);">dotnet new aspire-ts-cs-starter</span>
+    <span style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:20px;padding:6px 14px;font-size:13px;color:var(--text-secondary);">5 Ressourcen · 3 Sprachen · 1 AppHost</span>
+    <span style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:20px;padding:6px 14px;font-size:13px;color:var(--text-secondary);">Aspire SDK 13.4.6</span>
+  </div>
+  <aside class="notes">
+- Keksdose: Python-Sensor simuliert jemanden der Kekse nimmt (2–10s Intervall)
+- Event über RabbitMQ → ASP.NET Server konsumiert und speichert in PostgreSQL
+- React-Frontend bekommt Updates per SSE, kann manuell auffüllen per POST
+- Das Interessante: 3 Sprachen (.NET, Python, TypeScript), alles in einem AppHost
+- Template-Ausgangspunkt: aspire-ts-cs-starter — hat ASP.NET + React bereits verdrahtet
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 4: APPHOST
+═══════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="fade-up label">Aspire AppHost</div>
+  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Lokale Orchestrierung</h2>
+  <div class="fade-up rule"></div>
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;align-items:stretch;">
+    <div class="card card-quality" style="padding:18px 22px;">
+      <p style="font-size:13px;font-weight:700;color:var(--text-quality);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Ein Kommando</p>
+      <p style="font-size:16px;color:var(--text-primary);line-height:1.55;">
+        <code style="color:var(--text-accent);font-size:15px;">dotnet run --project AppHost</code><br>
+        <span style="color:var(--text-secondary);font-size:14px;">PostgreSQL, RabbitMQ, Python-Sensor, .NET API, React — alles startet, verbindet und wartet aufeinander.</span>
+      </p>
+    </div>
+    <div class="card card-accent" style="padding:18px 22px;">
+      <p style="font-size:13px;font-weight:700;color:var(--text-accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Polyglot out of the box</p>
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
+        .NET via <code style="color:var(--text-primary);">AddProject&lt;&gt;</code><br>
+        Python via <code style="color:var(--text-primary);">AddPythonApp</code><br>
+        React/Vite via <code style="color:var(--text-primary);">AddViteApp</code><br>
+        Alles gleichwertig im AppHost.
+      </p>
+    </div>
+    <div class="card" style="padding:18px 22px;">
+      <p style="font-size:13px;font-weight:700;color:var(--text-trust);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">WaitFor &amp; WithReference</p>
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
+        <code style="color:var(--text-primary);">.WaitFor(rabbitmq)</code> — wartet auf Healthy<br>
+        <code style="color:var(--text-primary);">.WithReference(db)</code> — injiziert Connection String<br>
+        Keine Race Conditions mehr bei Startup.
+      </p>
+    </div>
+    <div class="card card-quality" style="padding:18px 22px;">
+      <p style="font-size:13px;font-weight:700;color:var(--text-quality);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Dashboard</p>
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
+        Strukturierte Logs, Traces &amp; Metrics live im Browser.<br>
+        OpenTelemetry out of the box —<br>kein separates Monitoring-Setup nötig.
+      </p>
+    </div>
+  </div>
+  <aside class="notes">
+- AppHost ist das Herzstück — definiert die gesamte Infrastruktur als Code
+- WaitFor: der Killer-Feature für lokale Dev — keine "ist die DB schon da?"-Probleme mehr
+- WithReference: nicht nur Startup-Reihenfolge, sondern auch Connection String Injection
+- Polyglot: Python braucht ein .venv, aber das ist alles
+- Dashboard: zeige das live — Traces über alle Services hinweg, structured logs
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 5: PARAMETER & SECRETS
+═══════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="fade-up label">Konfiguration</div>
+  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Parameter &amp; Secrets</h2>
+  <div class="fade-up rule"></div>
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card card-accent" style="padding:18px 22px;">
+        <p style="font-size:13px;font-weight:700;color:var(--text-accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">🔐 Secret — kein Default</p>
+        <pre style="font-size:12.5px;margin-bottom:10px;"><span class="kw">var</span> pwd = builder.<span class="ty">AddParameter</span>(
+  <span class="str">"rabbitmq-password"</span>,
+  secret: <span class="kw">true</span>);</pre>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
+          → Gespeichert in <code style="color:var(--text-primary);">dotnet user-secrets</code><br>
+          → Kein Wert = Fehler beim Start<br>
+          → Production: Azure Key Vault, Kubernetes Secrets
+        </p>
+      </div>
+      <pre style="font-size:12px;"><span class="cm"># Lokal setzen</span>
+dotnet user-secrets <span class="kw">set</span> \
+  <span class="str">"Parameters:rabbitmq-password"</span> \
+  <span class="str">"supersecret"</span></pre>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card" style="padding:18px 22px;">
+        <p style="font-size:13px;font-weight:700;color:var(--text-trust);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">⚙️ Parameter — mit Default</p>
+        <pre style="font-size:12.5px;margin-bottom:10px;"><span class="kw">var</span> cap = builder.<span class="ty">AddParameter</span>(
+  <span class="str">"cookie-jar-capacity"</span>,
+  <span class="str">"100"</span>); <span class="cm">// Default im Code</span></pre>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
+          → Kein Secret, kein user-secrets nötig<br>
+          → Injiziert als <code style="color:var(--text-primary);">CookieJar__Capacity</code><br>
+          → <code style="color:var(--text-primary);">IOptionsMonitor&lt;T&gt;</code> im Service
+        </p>
+      </div>
+      <div class="card card-quality" style="padding:14px 18px;">
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
+          Beide Typen fließen als <strong style="color:var(--text-primary);">Umgebungsvariablen</strong> in die Services —<br>
+          Aspire übernimmt Naming Convention und Injection.
+        </p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+- Unterschied secret vs. plain Parameter klar machen
+- secret: true → Aspire verlangt Wert aus user-secrets, env var oder Key Vault — kein Default möglich (Sicherheit!)
+- plain parameter: Default in Code, überschreibbar — gut für Feature-Konfiguration
+- IOptionsMonitor: live reload wenn Config sich ändert, ohne Neustart
+- Prod: gleiche AppHost-Definition, andere Secret-Quelle (Key Vault, K8s Secrets)
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 6: ASPIRE INTERN
+═══════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="fade-up label">Unter der Haube</div>
+  <h2 class="fade-up slide-title" style="margin-bottom:10px;">Wie Aspire intern funktioniert</h2>
+  <div class="fade-up rule" style="margin-bottom:12px;"></div>
+
+  <!-- E: Dashboard — full-width banner -->
+  <div class="fade-up card" style="width:100%;padding:14px 22px;margin-bottom:12px;display:flex;align-items:center;gap:20px;border-left-color:var(--color-trust);">
+    <span style="font-size:22px;flex-shrink:0;">🖥️</span>
+    <div>
+      <h3 style="font-size:15px;font-weight:700;color:var(--text-trust);margin-bottom:4px;">Dashboard — kein externer Service</h3>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;">
+        Teil des AppHost-Prozesses. Services senden OTLP via Env-Var-konfiguriertem Endpoint direkt an den AppHost-internen Collector.
+        Daneben läuft ein <strong style="color:var(--text-primary);">gRPC-Backchannel</strong> für Ressourcenstatus, Live-Logs und Commands wie <code style="color:var(--text-primary);">aspire publish</code>.
+      </p>
+    </div>
+  </div>
+
+  <!-- A B C D — 2×2 grid -->
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;align-items:stretch;">
+    <div class="card card-quality" style="padding:16px 20px;">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-quality);margin-bottom:8px;">🧩 Annotations-Modell</h3>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
+        Alles ist ein <code style="color:var(--text-primary);">IResource</code>. Der Builder akkumuliert nur <strong style="color:var(--text-primary);">Annotations</strong>
+        (<code style="color:var(--text-primary);">ContainerImageAnnotation</code>, <code style="color:var(--text-primary);">WaitForAnnotation</code>&nbsp;…).<br>
+        <code style="color:var(--text-primary);">Build()</code> materialisiert das Modell — danach nur noch Ausführung.
+      </p>
+    </div>
+    <div class="card card-accent" style="padding:16px 20px;">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-accent);margin-bottom:8px;">🔗 WithReference — Env Var Injection</h3>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
+        <code style="color:var(--text-primary);">.WithReference(db)</code> hängt eine <code style="color:var(--text-primary);">EnvironmentCallbackAnnotation</code> an.<br>
+        Beim Start löst Aspire den Ausdruck auf und setzt<br>
+        <code style="color:var(--text-primary);">ConnectionStrings__&lt;name&gt;</code> — kein fixer Port im Code.
+      </p>
+    </div>
+    <div class="card" style="padding:16px 20px;">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-trust);margin-bottom:8px;">🔍 Service Discovery</h3>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
+        Aspire setzt <code style="color:var(--text-primary);">services__server__http__0=http://localhost:PORT</code>.<br>
+        <code style="color:var(--text-primary);">AddServiceDefaults()</code> registriert einen Resolver,<br>
+        der <code style="color:var(--text-primary);">IConfiguration</code> auswertet →
+        <code style="color:var(--text-primary);">http://server</code> funktioniert.
+      </p>
+    </div>
+    <div class="card card-quality" style="padding:16px 20px;">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-quality);margin-bottom:8px;">❤️ WaitFor — mehr als Port-Polling</h3>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
+        Interne State Machine: <em>Starting → Running → Healthy</em>.<br>
+        <code style="color:var(--text-primary);">.WaitFor(x)</code> blockiert bis Zielzustand erreicht,<br>
+        nicht nur bis der Port offen ist.
+      </p>
+    </div>
+  </div>
+  <aside class="notes">
+- Annotations: Builder ist ein reiner Konfigurations-Akkumulator — Build() ist der Moment wo alles zusammenkommt
+- WithReference: der entscheidende Mechanismus — erklärt warum keine Ports hardcodiert sind
+- Service Discovery: ServiceEndpointResolver aus Aspire.ServiceDefaults — zeigen wie die Env Var aussieht
+- WaitFor: State Machine zeigt im Dashboard — Starting, Running, Healthy sichtbar
+- Dashboard: Backchannel ist auch die Basis für aspire publish und MCP — der rote Faden
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 7: ASPIRE CLI
+═══════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="fade-up label">Aspire CLI</div>
+  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Mehr als lokale Entwicklung</h2>
+  <div class="fade-up rule"></div>
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <p style="font-size:16px;font-weight:700;color:var(--text-trust);">Lokal</p>
+      <pre style="font-size:13px;"><span class="cm"># Starten</span>
+dotnet <span class="kw">run</span> --project AppHost
+
+<span class="cm"># Dashboard direkt öffnen</span>
+aspire dashboard</pre>
+      <div class="card" style="padding:16px 20px;">
+        <ul class="bullet-list" style="gap:10px;">
+          <li><span style="font-size:15px;color:var(--text-primary);">Gesamter Stack mit einem Befehl</span></li>
+          <li><span style="font-size:15px;color:var(--text-primary);">Hot Reload für alle Services</span></li>
+          <li><span style="font-size:15px;color:var(--text-primary);">Dashboard für Observability</span></li>
+        </ul>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <p style="font-size:16px;font-weight:700;color:var(--text-accent);">Deployment-Artifacts generieren</p>
+      <pre style="font-size:12px;"><span class="cm"># Docker Compose</span>
+aspire publish \
+  --output-format <span class="str">docker-compose</span> \
+  --output-path ./deploy/docker
+
+<span class="cm"># Kubernetes / Helm</span>
+aspire publish \
+  --output-format <span class="str">helm</span> \
+  --output-path ./deploy/helm
+
+<span class="cm"># Kamal (custom publisher)</span>
+aspire publish \
+  --output-format <span class="str">kamal</span> \
+  --output-path ./deploy/kamal</pre>
+      <div class="card card-accent" style="padding:14px 18px;">
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;">
+          Gleiche AppHost-Definition — drei Deployment-Ziele.<br>
+          Custom: <code style="color:var(--text-primary);">IDistributedApplicationPublisher</code>
+        </p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+- CLI ist der Schlüssel: gleicher AppHost, verschiedene --output-format
+- Built-in: docker-compose, helm, kube-manifest
+- Kamal ist ein custom publisher — RegisterKeyedSingleton im AppHost
+- Zeige alle drei im Demo — aspire publish läuft durch, generiert Artifacts
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 8: DEPLOYMENT — DOCKER & KUBERNETES
+═══════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="fade-up label">Deployment</div>
+  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Docker Compose &amp; Kubernetes</h2>
+  <div class="fade-up rule"></div>
+  <div class="fade-up card" style="padding:12px 20px;margin-bottom:14px;border-left-color:var(--color-primary-mid);">
+    <p style="font-size:13px;color:var(--text-secondary);">
+      ℹ️ <strong style="color:var(--text-primary);">Azure</strong> ist first-class citizen in Aspire (Container Apps, AZD, Azure-Hosting-Integrationen) —
+      in diesem Vortrag fokussieren wir uns auf Docker und Kubernetes.
+    </p>
+  </div>
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%;align-items:stretch;">
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <p style="font-size:15px;font-weight:700;color:var(--text-trust);">🐳 Docker Compose</p>
+      <pre style="font-size:12.5px;">aspire publish \
+  --output-format <span class="str">docker-compose</span> \
+  --output-path ./deploy/docker
+
+docker compose \
+  -f ./deploy/docker/docker-compose.yml \
+  up --build</pre>
+      <div class="card" style="flex:1;padding:14px 18px;">
+        <ul class="bullet-list" style="gap:9px;">
+          <li><span style="font-size:14px;">docker-compose.yml mit allen Services</span></li>
+          <li><span style="font-size:14px;">Volumes &amp; Networking generiert</span></li>
+          <li><span style="font-size:14px;">Gut für: Single-Server, Staging</span></li>
+          <li><span style="font-size:14px;">Image-Push zu Registry unterstützt</span></li>
+        </ul>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <p style="font-size:15px;font-weight:700;color:var(--text-quality);">☸️ Kubernetes / Helm</p>
+      <pre style="font-size:12.5px;">aspire publish \
+  --output-format <span class="str">helm</span> \
+  --output-path ./deploy/helm
+
+helm upgrade --install cookiejar \
+  ./deploy/helm -n cookiejar</pre>
+      <div class="card card-quality" style="flex:1;padding:14px 18px;">
+        <ul class="bullet-list" style="gap:9px;">
+          <li><span style="font-size:14px;">Helm Chart mit Deployments, Services</span></li>
+          <li><span style="font-size:14px;">ConfigMaps &amp; Secrets generiert</span></li>
+          <li><span style="font-size:14px;"><code style="color:var(--text-quality);">aspire deploy --list-steps</code> (experimentell)</span></li>
+          <li><span style="font-size:14px;">Ingress: manuell nötig</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+- Azure nicht vergessen zu erwähnen: azd up, Container Apps, Azure-Hosting — aber nicht Thema heute
+- Docker Compose: vollständig generiert — Services, Volumes, Networking, .env-Datei
+- Helm: guter Ausgangspunkt, Ingress und TLS muss man selbst konfigurieren
+- aspire deploy: Pipeline-basiert, experimentell in 13 — zeige --list-steps wenn Zeit
+- Beide Targets kommen aus der gleichen AppHost-Definition — das ist der Kernwert
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 9: KAMAL — CUSTOM PUBLISHER
+═══════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="fade-up label">Custom Deployment Adapter</div>
+  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Kamal — eigener Publisher</h2>
+  <div class="fade-up rule"></div>
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%;align-items:stretch;">
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="card" style="padding:16px 20px;">
+        <p style="font-size:13px;font-weight:700;color:var(--text-trust);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">Was ist Kamal?</p>
+        <ul class="bullet-list" style="gap:9px;">
+          <li><span style="font-size:14px;">Docker auf Bare-Metal oder Cloud-VMs</span></li>
+          <li><span style="font-size:14px;">Kein Kubernetes — SSH + Docker reicht</span></li>
+          <li><span style="font-size:14px;">Zero-downtime Deploy, Rolling Restart</span></li>
+          <li><span style="font-size:14px;"><code style="color:var(--text-primary);">kamal setup &amp;&amp; kamal deploy</code></span></li>
+        </ul>
+      </div>
+      <pre style="font-size:12px;"><span class="cm"># Generieren</span>
+aspire publish \
+  --output-path ./deploy/kamal
+
+<span class="cm"># Ausgabe:</span>
+<span class="cm">#   deploy.yml</span>
+<span class="cm">#   .kamal/secrets.example</span></pre>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="card card-accent" style="padding:16px 20px;">
+        <p style="font-size:13px;font-weight:700;color:var(--text-accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">PipelineStep implementieren</p>
+        <pre style="font-size:11.5px;"><span class="kw">var</span> step = <span class="kw">new</span> <span class="ty">PipelineStep</span> {
+  Name = <span class="str">"generate-kamal-config"</span>,
+  Action = <span class="kw">async</span> ctx =&gt; {
+    <span class="kw">var</span> output = ctx.<span class="ty">Services</span>
+      .GetRequiredService&lt;
+        <span class="ty">IPipelineOutputService</span>&gt;();
+    <span class="cm">// Generiert deploy.yml + .kamal/secrets</span>
+  }
+};
+step.<span class="ty">RequiredBy</span>(
+  <span class="ty">WellKnownPipelineSteps</span>.Publish);</pre>
+      </div>
+      <pre style="font-size:12px;"><span class="cm">// In AppHost.cs registrieren:</span>
+builder.<span class="ty">AddResource</span>(
+    <span class="kw">new</span> <span class="ty">KamalDeploymentResource</span>(<span class="str">"kamal"</span>))
+  .<span class="ty">WithPipelineStepFactory</span>(
+    <span class="ty">KamalPipelineStep</span>.Create);</pre>
+    </div>
+  </div>
+  <aside class="notes">
+- Kamal: von 37signals (Basecamp/Rails) — "deploy anywhere, no Kubernetes"
+- PipelineStep statt IDistributedApplicationPublisher — neues API in Aspire 13 (noch experimental)
+- Step walks the resource model: PostgresServerResource → Kamal accessory, ProjectResource → main service
+- IPipelineOutputService liefert den Output-Pfad — kein IOptions<PublishingOptions> mehr nötig
+- RequiredBy(WellKnownPipelineSteps.Publish): Step läuft automatisch bei aspire publish
+- Output zeigen: deploy.yml + .kamal/secrets.example
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 10: ASPIRE MCP (was 9)
+═══════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="fade-up label">Aspire MCP · kurz</div>
+  <h2 class="fade-up slide-title" style="margin-bottom:8px;">KI-Tooling mit Anwendungskontext</h2>
+  <div class="fade-up rule"></div>
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <pre style="font-size:13px;"><span class="cm"># MCP-Server einrichten</span>
+aspire agent init
+
+<span class="cm"># → konfiguriert claude_desktop_config.json</span>
+<span class="cm"># → oder andere MCP-fähige KI-Tools</span></pre>
+      <div class="card card-quality" style="padding:18px 22px;">
+        <p style="font-size:14px;font-weight:700;color:var(--text-quality);margin-bottom:10px;">Was der MCP-Server bereitstellt</p>
+        <ul class="bullet-list" style="gap:9px;">
+          <li><span style="font-size:14px;">Laufende Ressourcen &amp; deren Status</span></li>
+          <li><span style="font-size:14px;">Structured Logs live abrufbar</span></li>
+          <li><span style="font-size:14px;">Traces &amp; Metrics</span></li>
+          <li><span style="font-size:14px;">Aspire Dokumentation durchsuchbar</span></li>
+        </ul>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card card-accent" style="padding:18px 22px;">
+        <p style="font-size:14px;font-weight:700;color:var(--text-accent);margin-bottom:10px;">Echter Mehrwert heute</p>
+        <ul class="bullet-list" style="gap:9px;">
+          <li><span style="font-size:14px;">Schnelles Onboarding: KI versteht die Architektur sofort</span></li>
+          <li><span style="font-size:14px;">Live-Diagnose: "Warum schlägt Service X fehl?"</span></li>
+          <li><span style="font-size:14px;">Testing: KI kann Ressourcen direkt abfragen</span></li>
+        </ul>
+      </div>
+      <div class="card" style="padding:16px 20px;">
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
+          <strong style="color:var(--text-primary);">Fazit:</strong> MCP macht Aspire zum strukturierten Kontext-Provider für KI-Tools —
+          das ist der interessanteste Aspire-Trend 2026.
+        </p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+- MCP = Model Context Protocol — standardisiertes Interface für KI-Tools zu externen Systemen
+- aspire agent init richtet den MCP-Server ein — dann kann Claude/Copilot direkt auf die Aspire-App zugreifen
+- Demo: KI fragt "welche Services laufen?" und bekommt echte Antwort aus dem Dashboard
+- Diagnose-Szenario: KI liest Logs eines fehlerhaften Services und gibt sofort Kontext
+- Work in Progress, aber schon heute nützlich
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 10: LIMITS & LESSONS LEARNED
+═══════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="fade-up label">Lessons Learned</div>
+  <h2 class="fade-up slide-title" style="margin-bottom:8px;">Was Aspire kann — und was noch nicht</h2>
+  <div class="fade-up rule"></div>
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;align-items:stretch;">
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <p style="font-size:15px;font-weight:700;color:var(--text-accent);">⚠️ Herausforderungen</p>
+      <div class="card card-accent" style="padding:16px 20px;flex:1;">
+        <ul class="bullet-list" style="gap:11px;">
+          <li><span style="font-size:14px;color:var(--text-primary);">Helm-Output ist <em>Ausgangspunkt</em>, nicht Endprodukt — Ingress &amp; TLS manuell</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Polyglot-Debugging: Python- &amp; Node-Services haben keinen Aspire-nativen Debugger</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Deployment-Features (Pipeline, Dockerfile Builder) noch experimentell</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Azure-Parität: nicht alle Aspire-Ressourcen haben ein 1:1-Azure-Pendant</span></li>
+        </ul>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <p style="font-size:15px;font-weight:700;color:var(--text-quality);">✅ Bewährte Patterns</p>
+      <div class="card card-quality" style="padding:16px 20px;flex:1;">
+        <ul class="bullet-list" style="gap:11px;">
+          <li><span style="font-size:14px;color:var(--text-primary);"><code style="color:var(--text-quality);">WaitFor</code> konsequent nutzen — nie auf Timeouts verlassen</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Alle Credentials als Parameter — auch lokal, auch wenn es "nur dev" ist</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Aspire für Orchestrierung, nicht als Application Framework</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);"><code style="color:var(--text-quality);">AddServiceDefaults()</code> in jedem Service — Observability kostet nichts</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);"><code style="color:var(--text-quality);">.WithReplicas(2)</code> — Produktionsprobleme durch Replica-Interferenz lokal nachstellen</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+- Das ist die ehrliche Seite — was ich Kunden und Teams sage bevor sie Aspire einführen
+- Herausforderungen sind keine Deal-Breaker, aber man muss sie kennen
+- Patterns: WaitFor ist fast immer die richtige Antwort auf Startup-Probleme
+- "Aspire für Orchestrierung, nicht als Framework": Aspire soll verdrahten, nicht die App-Logik bestimmen
+- WithReplicas: konkretes Beispiel aus dem Demo — CookieJarService hat In-Memory-Subscriber-Liste für SSE.
+  Mit einer Instanz funktioniert alles. Mit zwei Replicas: Keks wird auf Replica A genommen,
+  DB-Update passiert, aber Broadcast geht nur an SSE-Clients die auf Replica A verbunden sind —
+  Clients auf Replica B sehen keine Live-Updates. Genau so ein Bug tritt in Produktion auf,
+  und mit .WithReplicas(2) kann man ihn lokal sofort reproduzieren und fixen (z.B. Redis Pub/Sub).
+- Fazit insgesamt: Aspire spart massiv Zeit bei lokaler Entwicklung, beim Deployment ist man noch nicht am Ziel
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 11: Q&A & FEEDBACK
+═══════════════════════════════════════════════ -->
+<section class="slide" style="align-items:center;justify-content:center;text-align:center;">
+  <div style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle, rgba(243,145,37,0.08) 0%, transparent 70%);pointer-events:none;"></div>
+  <div style="position:absolute;bottom:28px;right:48px;opacity:0.8;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1698.32 274.41" style="height:26px;width:auto;display:block;" aria-label="vensas">
+      <style>.vl{fill:#fff;stroke-width:0}</style>
+      <polygon class="vl" points="0 0 41.73 72.25 62.09 107.51 137.34 237.88 158.43 274.41 243.38 274.41 200.93 200.89 126.68 72.34 84.95 0 0 0"/>
+      <path class="vl" d="M221.91,164.48l-21.02,36.38h84.38s55.51-95.25,55.51-95.25l12.78-21.92c1.93-3.31,1.94-7.39.02-10.71L314.53,5.33C312.62,2.03,309.1,0,305.29,0h-137.46s-40.83,72.34-40.83,72.34h148.15s-53.25,92.14-53.25,92.14Z"/>
+      <path class="vl" d="M547.97,36.1h55.88l-69.48,202.2h-62.87l-69.49-202.2h55.89l44.85,145.22,45.22-145.22Z"/>
+      <path class="vl" d="M713.41,31.69c33.09,0,59.25,11.39,78.49,34.19,19.24,22.79,27.51,51.1,24.82,84.93h-155.15c1.71,15.69,7.36,27.7,16.91,36.03,9.56,8.34,21.44,12.5,35.66,12.5,10.29,0,19.48-2.26,27.57-6.8,8.09-4.53,13.85-10.72,17.28-18.57h54.41c-7.11,22.8-19.61,39.95-37.5,51.47-17.89,11.52-38.36,17.28-61.4,17.28-31.37,0-56.98-9.93-76.84-29.78-19.86-19.86-29.78-44.98-29.78-75.37s9.92-55.64,29.78-75.74c19.86-20.09,45.1-30.14,75.74-30.14ZM713.05,75.07c-12.5,0-22.92,3.37-31.25,10.11-8.34,6.75-14.22,15.75-17.65,27.02h96.69c-2.94-11.27-8.58-20.28-16.91-27.02-8.34-6.74-18.63-10.11-30.88-10.11Z"/>
+      <path class="vl" d="M960.47,31.69c22.79,0,40.68,7.11,53.67,21.32,12.99,14.21,19.49,33.7,19.49,58.46v126.84h-52.57v-115.44c0-13.73-2.94-24.02-8.82-30.89-5.88-6.86-15.57-10.29-29.04-10.29-30.4,0-45.59,16.79-45.59,50.37v106.25h-52.57V36.1h52.57v27.57c15.19-21.32,36.15-31.98,62.87-31.98Z"/>
+      <path class="vl" d="M1159.73,242.72c-27.21,0-49.88-6.3-68.01-18.93-18.14-12.62-29.04-29.96-32.72-52.02h53.31c4.41,18.14,20.71,27.21,48.9,27.21,22.79,0,34.19-5.52,34.19-16.54,0-1.47-.18-2.82-.55-4.04-.37-1.23-.98-2.33-1.84-3.31-.86-.98-1.78-1.89-2.76-2.75-.98-.86-2.39-1.66-4.23-2.39-1.84-.73-3.49-1.34-4.96-1.84-1.47-.49-3.62-1.1-6.43-1.84-2.82-.74-5.27-1.35-7.36-1.84-2.08-.49-4.96-1.1-8.64-1.84-3.68-.73-6.86-1.47-9.56-2.2-30.15-7.11-51.17-14.89-63.05-23.35-11.89-8.46-17.83-21.14-17.83-38.05,0-21.07,8.02-37.55,24.08-49.45,16.05-11.88,37.56-17.83,64.52-17.83s47.91,5.82,62.87,17.46c14.95,11.64,24.27,27.39,27.94,47.25h-53.31c-4.41-13.73-17.52-20.59-39.34-20.59s-33.83,5.64-33.83,16.91c0,4.41,2.33,7.6,6.99,9.56,4.65,1.96,15.19,4.78,31.62,8.46,16.42,3.68,29.41,7.05,38.97,10.11,9.56,3.07,18.62,7.05,27.2,11.95,8.58,4.91,14.71,10.79,18.38,17.64,3.68,6.87,5.52,15.2,5.52,25,0,21.82-8.45,38.48-25.37,50-16.91,11.52-38.48,17.28-64.71,17.28Z"/>
+      <path class="vl" d="M1427.74,36.1h52.57l-.37,202.2h-52.57v-27.21c-15.44,21.08-36.52,31.62-63.24,31.62s-48.78-9.86-66.17-29.59c-17.41-19.73-26.1-45.04-26.1-75.92s8.76-56.19,26.28-75.92c17.52-19.72,39.39-29.59,65.62-29.59s48.28,10.91,63.97,32.72v-28.31ZM1375.9,192.72c14.95,0,27.33-5.14,37.13-15.44,9.8-10.29,14.71-23.65,14.71-40.07s-4.91-29.78-14.71-40.07c-9.8-10.29-22.18-15.44-37.13-15.44s-27.21,5.15-36.76,15.44c-9.56,10.29-14.34,23.66-14.34,40.07s4.84,29.78,14.52,40.07c9.68,10.3,21.87,15.44,36.58,15.44Z"/>
+      <path class="vl" d="M1608.25,242.72c-27.21,0-49.88-6.3-68.01-18.93-18.14-12.62-29.04-29.96-32.72-52.02h53.31c4.41,18.14,20.71,27.21,48.9,27.21,22.79,0,34.19-5.52,34.19-16.54,0-1.47-.18-2.82-.55-4.04-.37-1.23-.98-2.33-1.84-3.31-.86-.98-1.78-1.89-2.76-2.75-.98-.86-2.39-1.66-4.23-2.39-1.84-.73-3.49-1.34-4.96-1.84-1.47-.49-3.62-1.1-6.43-1.84-2.82-.74-5.27-1.35-7.35-1.84-2.09-.49-4.96-1.1-8.64-1.84-3.68-.73-6.87-1.47-9.56-2.2-30.15-7.11-51.17-14.89-63.05-23.35-11.89-8.46-17.83-21.14-17.83-38.05,0-21.07,8.03-37.55,24.08-49.45,16.05-11.88,37.56-17.83,64.52-17.83s47.92,5.82,62.87,17.46c14.94,11.64,24.26,27.39,27.94,47.25h-53.31c-4.41-13.73-17.52-20.59-39.34-20.59s-33.82,5.64-33.82,16.91c0,4.41,2.32,7.6,6.98,9.56,4.65,1.96,15.19,4.78,31.62,8.46,16.42,3.68,29.41,7.05,38.97,10.11,9.56,3.07,18.62,7.05,27.21,11.95,8.57,4.91,14.7,10.79,18.38,17.64,3.68,6.87,5.51,15.2,5.51,25,0,21.82-8.45,38.48-25.37,50-16.91,11.52-38.48,17.28-64.71,17.28Z"/>
+    </svg>
+  </div>
+  <div class="fade-up label" style="text-align:center;">Fragen?</div>
+  <h2 class="fade-up" style="font-size:52px;font-weight:800;color:var(--text-primary);line-height:1.1;margin-top:12px;margin-bottom:36px;">Danke!</h2>
+
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;width:100%;max-width:820px;align-items:center;">
+    <!-- QR Code -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+      <img src="dwx-feedback-qr-code.png" alt="DWX Feedback QR Code"
+           style="width:210px;height:210px;border-radius:10px;background:#fff;padding:8px;">
+      <p style="font-size:15px;font-weight:600;color:var(--text-trust);">Feedback?</p>
+    </div>
+
+    <!-- Contact info -->
+    <div style="display:flex;flex-direction:column;gap:16px;text-align:left;">
+      <div class="contact-row">
+        <svg style="width:18px;height:18px;flex-shrink:0;opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <a href="https://vensas.de" class="contact-link" style="font-size:17px;">vensas.de</a>
+      </div>
+      <div class="contact-row">
+        <svg style="width:18px;height:18px;flex-shrink:0;opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+        <a href="mailto:kontakt@vensas.de" class="contact-link" style="font-size:17px;">kontakt@vensas.de</a>
+      </div>
+      <div class="contact-row">
+        <svg style="width:18px;height:18px;flex-shrink:0;opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.77 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.69a16 16 0 0 0 5.93 5.93l1.05-1.06a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <a href="tel:+4968130984780" class="contact-link" style="font-size:17px;">+49 (0)681 30984780</a>
+      </div>
+      <div class="contact-row">
+        <svg style="width:18px;height:18px;flex-shrink:0;opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        <a href="https://linkedin.com/company/vensas-gmbh" class="contact-link" style="font-size:17px;">linkedin.com/company/vensas-gmbh</a>
+      </div>
+      <div class="contact-row">
+        <svg style="width:18px;height:18px;flex-shrink:0;opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        <a href="https://github.com/vensas" class="contact-link" style="font-size:17px;">github.com/vensas</a>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+- Zeit für Fragen lassen — das ist oft der wertvollste Teil
+- QR-Code für DWX-Feedback-App einscannen
+- Blog-Artikel verweisen: vensas.de/de/blog — Aspire-Serie mit Deployment-Limits, Architecture, Polyglot
+- Gerne auch im Nachgang per Mail oder LinkedIn
+  </aside>
+</section>
+
+
+</div><!-- /.deck -->
+
+<div class="progress" id="progress"></div>
+<div class="counter" id="counter"></div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let current = 0;
+  const channel = new BroadcastChannel('vensas-slides');
+  let presenterWin = null;
+
+  const notes  = [...slides].map(s => { const n = s.querySelector('.notes'); return n ? n.innerText.trim() : ''; });
+  const titles = [...slides].map(s => { const h = s.querySelector('h1,h2'); return h ? h.innerText.trim() : ''; });
+
+  function show(n, broadcast = true) {
+    slides[current].classList.remove('active');
+    current = (n + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    document.getElementById('progress').style.width = ((current + 1) / slides.length * 100) + '%';
+    document.getElementById('counter').textContent  = (current + 1) + ' / ' + slides.length;
+    history.replaceState(null, '', '#' + (current + 1));
+    if (broadcast) channel.postMessage({ current, total: slides.length, notes, titles });
+  }
+
+  function presenterHTML() {
+    return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Speaker Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:#0a0b0d;color:#fff;display:grid;grid-template-rows:auto 1fr auto;height:100vh;overflow:hidden;}
+header{background:#1a1e2a;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);}
+header h1{font-size:14px;font-weight:600;color:#f39125;}
+#counter{font-size:13px;color:#9b99a4;}
+main{display:grid;grid-template-rows:auto 1fr;overflow:hidden;}
+#next-title{padding:16px 24px 12px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#6abea7;border-bottom:1px solid rgba(255,255,255,0.07);}
+#notes-box{padding:24px;overflow-y:auto;font-size:15px;line-height:1.75;color:#cac8cf;white-space:pre-wrap;}
+footer{background:#1a1e2a;padding:10px 24px;font-size:11px;color:#6b7280;border-top:1px solid rgba(255,255,255,0.07);text-align:center;}
+</style></head><body>
+<header><h1>Speaker Notes</h1><span id="counter">– / –</span></header>
+<main>
+  <div id="next-title">Next slide: –</div>
+  <div id="notes-box">Waiting for presentation…</div>
+</main>
+<footer>Synced · ← → to navigate</footer>
+<script>
+  const ch = new BroadcastChannel('vensas-slides');
+  document.addEventListener('keydown', e => {
+    if(['ArrowRight','ArrowDown',' '].includes(e.key)){e.preventDefault();ch.postMessage({nav:'next'});}
+    if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();ch.postMessage({nav:'prev'});}
+  });
+  ch.onmessage = ({data}) => {
+    if(!data.notes) return;
+    document.getElementById('counter').textContent = (data.current+1)+' / '+data.total;
+    document.getElementById('notes-box').textContent = data.notes[data.current] || '(keine Notizen)';
+    document.getElementById('next-title').textContent = 'Nächste Folie: '+(data.titles[data.current+1]||'—');
+  };
+<\/script></body></html>`;
+  }
+
+  function openPresenter() {
+    if (presenterWin && !presenterWin.closed) { presenterWin.focus(); return; }
+    presenterWin = window.open('', 'presenter', 'width=700,height=500,left=100,top=100,resizable=yes,scrollbars=yes');
+    presenterWin.document.open(); presenterWin.document.write(presenterHTML()); presenterWin.document.close();
+    setTimeout(() => channel.postMessage({ current, total: slides.length, notes, titles }), 300);
+  }
+
+  channel.onmessage = ({data}) => {
+    if (data.nav === 'next') show(current + 1);
+    if (data.nav === 'prev') show(current - 1);
+  };
+
+  const saved = localStorage.getItem('vensas-slide-theme');
+  if (saved) applyTheme(saved);
+
+  function chartColors() {
+    const dark = document.body.classList.contains('theme-dark');
+    return { text: dark ? '#cac8cf' : '#2c3341', grid: dark ? 'rgba(255,255,255,0.08)' : 'rgba(44,51,65,0.10)', dataset: '#f39125' };
+  }
+
+  function applyTheme(theme) {
+    document.body.classList.remove('theme-dark','theme-light');
+    document.body.classList.add(theme);
+      localStorage.setItem('vensas-slide-theme', theme);
+  }
+
+  function toggleTheme() { applyTheme(document.body.classList.contains('theme-dark') ? 'theme-light' : 'theme-dark'); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 's' || e.key === 'S') { openPresenter(); return; }
+    if (e.key === 't' || e.key === 'T') { toggleTheme(); return; }
+    if (['ArrowRight','ArrowDown',' '].includes(e.key)) { e.preventDefault(); show(current + 1); }
+    if (['ArrowLeft','ArrowUp'].includes(e.key)) { e.preventDefault(); show(current - 1); }
+  });
+
+  document.getElementById('deck').addEventListener('click', e => {
+    if (e.target.closest('a')) return;
+    show(current + 1);
+  });
+
+document.querySelectorAll('a[href]').forEach(a => a.target = '_blank');
+  const initial = Math.min(parseInt(location.hash.slice(1)) - 1 || 0, slides.length - 1);
+  show(Math.max(0, initial));
+</script>
+</body>
+</html>
