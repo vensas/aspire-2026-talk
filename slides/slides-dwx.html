@@ -427,11 +427,11 @@
     </p>
   </div>
   <aside class="notes">
-- Tye war das Experiment — hat gezeigt was möglich ist
+- Project Tye - .NET Tool, CLI, gleiche Idee
 - Aspire Preview: viel Buzz, aber noch nicht produktionsreif
 - GA: erste Projekte in Prod, wir bei vensas auch dabei
 - Eigenständig ab 2025: nicht mehr an .NET-Release-Zyklus gebunden
-- 13.4: das ist die Version heute — solide, aber noch Ecken und Kanten bei Deployment
+- 13.4: das ist die Version heute
   </aside>
 </section>
 
@@ -515,11 +515,10 @@
   <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;align-items:stretch;">
     <div class="card card-quality" style="padding:18px 22px;">
       <p style="font-size:13px;font-weight:700;color:var(--text-quality);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Ein Kommando</p>
-      <p style="font-size:16px;color:var(--text-primary);line-height:1.55;">
-        <code style="color:var(--text-accent);font-size:15px;">aspire run</code><br>
-        <span style="color:var(--text-secondary);font-size:13px;">PostgreSQL, RabbitMQ, Python-Sensor, .NET API, React — alles startet, verbindet und wartet aufeinander.</span>
+      <p style="font-size:14px;color:var(--text-primary);line-height:1.55;">
+        <code style="color:var(--text-accent);font-size:14px;">aspire run</code><br>
       </p>
-      <p style="font-size:13px;color:var(--text-secondary);margin-top:10px;">
+      <p style="font-size:14px;color:var(--text-secondary);margin-top:10px;">
         Alternativ: <code style="color:var(--text-primary);font-size:12px;">dotnet run --project AppHost</code>
       </p>
     </div>
@@ -528,7 +527,6 @@
       <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
         .NET / C# via <code style="color:var(--text-primary);">AddProject&lt;&gt;</code><br>
         Python via <code style="color:var(--text-primary);">AddPythonApp</code><br>
-        Node.js / TypeScript via <code style="color:var(--text-primary);">AddNpmApp</code><br>
         React / Vite via <code style="color:var(--text-primary);">AddViteApp</code><br>
         Alles gleichwertig im AppHost.
       </p>
@@ -537,25 +535,25 @@
       <p style="font-size:13px;font-weight:700;color:var(--text-trust);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">WaitFor &amp; WithReference</p>
       <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
         <code style="color:var(--text-primary);">.WaitFor(rabbitmq)</code> — wartet auf Healthy<br>
-        <code style="color:var(--text-primary);">.WithReference(db)</code> — injiziert Connection String<br>
-        Keine Race Conditions mehr bei Startup.
+        <code style="color:var(--text-primary);">.WithReference(db)</code> — injiziert Umgebungsvariablen wie Connection Strings<br>
+        Keine Race Conditions beim Startup. Built-in Service Discovery.
       </p>
     </div>
     <div class="card card-quality" style="padding:18px 22px;">
       <p style="font-size:13px;font-weight:700;color:var(--text-quality);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Dashboard</p>
       <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
         Strukturierte Logs, Traces &amp; Metrics live im Browser.<br>
-        OpenTelemetry out of the box — kein separates Monitoring-Setup nötig.<br>
-        Services können <strong style="color:var(--text-primary);">mehrere Endpoints</strong> exponieren — Api, OpenApi-Dokumentation, etc. — alle klickbar im Dashboard.
+        OpenTelemetry out of the box<br>
+        Services können <strong style="color:var(--text-primary);">mehrere Endpoints</strong> exponieren — Api, OpenApi-Dokumentation, etc.
       </p>
     </div>
   </div>
   <aside class="notes">
 - AppHost ist das Herzstück — definiert die gesamte Infrastruktur als Code
-- WaitFor: der Killer-Feature für lokale Dev — keine "ist die DB schon da?"-Probleme mehr
-- WithReference: nicht nur Startup-Reihenfolge, sondern auch Connection String Injection
-- Tech-Stack-Unabhängigkeit: Python braucht ein .venv, aber das ist alles
-- Dashboard: zeige das live — Traces über alle Services hinweg, structured logs
+- aspire CLI für einfache Bedienung
+- WaitFor: Warten auf Abhängigkeiten
+- WithReference: injiziert Umgebungsvariablen wie Connection Strings
+- Tech-Stack-Unabhängigkeit: Python
   </aside>
 </section>
 
@@ -566,50 +564,44 @@
   <div class="fade-up label">Konfiguration</div>
   <h2 class="fade-up slide-title" style="margin-bottom:8px;">Parameter &amp; Secrets</h2>
   <div class="fade-up rule"></div>
-  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;">
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div class="card card-accent" style="padding:18px 22px;">
-        <p style="font-size:13px;font-weight:700;color:var(--text-accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">🔐 Secret — kein Default</p>
-        <pre style="font-size:12.5px;margin-bottom:10px;"><span class="kw">var</span> pwd = builder.<span class="ty">AddParameter</span>(
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;width:100%;align-items:stretch;">
+    <div class="card card-accent" style="padding:18px 22px;">
+      <p style="font-size:13px;font-weight:700;color:var(--text-accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">🔐 Secret — kein Default</p>
+      <pre style="font-size:12.5px;margin-bottom:10px;"><span class="kw">var</span> pwd = builder.<span class="ty">AddParameter</span>(
   <span class="str">"rabbitmq-password"</span>,
   secret: <span class="kw">true</span>);</pre>
-        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
-          → Gespeichert in <code style="color:var(--text-primary);">dotnet user-secrets</code><br>
-          → Kein Wert = Fehler beim Start<br>
-          → Production: Azure Key Vault, Kubernetes Secrets
-        </p>
-      </div>
-      <pre style="font-size:12px;"><span class="cm"># Lokal setzen</span>
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
+        → Gespeichert in <code style="color:var(--text-primary);">dotnet user-secrets</code><br>
+        → Kein Wert = Fehler beim Start<br>
+        → Production: Azure Key Vault, Kubernetes Secrets
+      </p>
+    </div>
+    <div class="card" style="padding:18px 22px;">
+      <p style="font-size:13px;font-weight:700;color:var(--text-trust);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">⚙️ Parameter — mit Default</p>
+      <pre style="font-size:12.5px;margin-bottom:10px;"><span class="kw">var</span> cap = builder.<span class="ty">AddParameter</span>(
+  <span class="str">"cookie-jar-capacity"</span>,
+  <span class="str">"100"</span>); <span class="cm">// Default im Code</span></pre>
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
+        → Kein Secret, kein user-secrets nötig<br>
+        → Injiziert als <code style="color:var(--text-primary);">CookieJar__Capacity</code><br>
+        → <code style="color:var(--text-primary);">IOptionsMonitor&lt;T&gt;</code> im Service
+      </p>
+    </div>
+    <pre style="font-size:12px;"><span class="cm"># Lokal setzen</span>
 dotnet user-secrets <span class="kw">set</span> \
   <span class="str">"Parameters:rabbitmq-password"</span> \
   <span class="str">"supersecret"</span></pre>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div class="card" style="padding:18px 22px;">
-        <p style="font-size:13px;font-weight:700;color:var(--text-trust);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">⚙️ Parameter — mit Default</p>
-        <pre style="font-size:12.5px;margin-bottom:10px;"><span class="kw">var</span> cap = builder.<span class="ty">AddParameter</span>(
-  <span class="str">"cookie-jar-capacity"</span>,
-  <span class="str">"100"</span>); <span class="cm">// Default im Code</span></pre>
-        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
-          → Kein Secret, kein user-secrets nötig<br>
-          → Injiziert als <code style="color:var(--text-primary);">CookieJar__Capacity</code><br>
-          → <code style="color:var(--text-primary);">IOptionsMonitor&lt;T&gt;</code> im Service
-        </p>
-      </div>
-      <div class="card card-quality" style="padding:14px 18px;">
-        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
-          Beide Typen fließen als <strong style="color:var(--text-primary);">Umgebungsvariablen</strong> in die Services —<br>
-          Aspire übernimmt Naming Convention und Injection.
-        </p>
-      </div>
+    <div class="card card-quality" style="padding:14px 18px;">
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
+        Beide Typen fließen als <strong style="color:var(--text-primary);">Umgebungsvariablen</strong> in die Services<br>
+      </p>
     </div>
   </div>
   <aside class="notes">
 - Unterschied secret vs. plain Parameter klar machen
-- secret: true → Aspire verlangt Wert aus user-secrets, env var oder Key Vault — kein Default möglich (Sicherheit!)
+- secret: true → Aspire verlangt Wert aus user-secrets oder env var — kein Default möglich (Sicherheit!)
 - plain parameter: Default in Code, überschreibbar — gut für Feature-Konfiguration
 - IOptionsMonitor: live reload wenn Config sich ändert, ohne Neustart
-- Prod: gleiche AppHost-Definition, andere Secret-Quelle (Key Vault, K8s Secrets)
   </aside>
 </section>
 
@@ -625,7 +617,7 @@ dotnet user-secrets <span class="kw">set</span> \
   <div class="fade-up card" style="width:100%;padding:14px 22px;margin-bottom:12px;border-left-color:var(--color-trust);">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
       <span style="font-size:20px;">🖥️</span>
-      <h3 style="font-size:15px;font-weight:700;color:var(--text-trust);">Dashboard</h3>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-trust);">Dashboard</h3>
       <span style="font-size:12px;color:var(--text-secondary);font-weight:400;">— läuft im AppHost-Prozess, kein separater Service</span>
     </div>
     <div style="display:flex;align-items:center;gap:0;flex-wrap:nowrap;">
@@ -648,7 +640,7 @@ dotnet user-secrets <span class="kw">set</span> \
   <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;align-items:stretch;">
     <div class="card card-quality" style="padding:16px 20px;">
       <h3 style="font-size:14px;font-weight:700;color:var(--text-quality);margin-bottom:8px;">🧩 Annotations-Modell</h3>
-      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
         Alles ist ein <code style="color:var(--text-primary);">IResource</code> mit <strong style="color:var(--text-primary);">Annotations</strong>
         (<code style="color:var(--text-primary);">ContainerImageAnnotation</code>, <code style="color:var(--text-primary);">WaitForAnnotation</code>&nbsp;…).<br>
         <code style="color:var(--text-primary);">Build()</code> materialisiert das Modell.
@@ -656,15 +648,15 @@ dotnet user-secrets <span class="kw">set</span> \
     </div>
     <div class="card card-accent" style="padding:16px 20px;">
       <h3 style="font-size:14px;font-weight:700;color:var(--text-accent);margin-bottom:8px;">🔗 WithReference</h3>
-      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
         <code style="color:var(--text-primary);">.WithReference(db)</code> setzt beim Start<br>
         <code style="color:var(--text-primary);">ConnectionStrings__&lt;name&gt;</code> als Env Var —<br>
-        kein fixer Port, kein Config-Boilerplate.
+        dynamische Ports
       </p>
     </div>
     <div class="card" style="padding:16px 20px;">
       <h3 style="font-size:14px;font-weight:700;color:var(--text-trust);margin-bottom:8px;">🔍 Service Discovery</h3>
-      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
         Aspire setzt <code style="color:var(--text-primary);">services__server__http__0=http://localhost:PORT</code>.<br>
         <code style="color:var(--text-primary);">AddServiceDefaults()</code> registriert einen Resolver —<br>
         <code style="color:var(--text-primary);">http://server</code> funktioniert ohne Konfiguration.
@@ -672,15 +664,14 @@ dotnet user-secrets <span class="kw">set</span> \
     </div>
     <div class="card card-quality" style="padding:16px 20px;">
       <h3 style="font-size:14px;font-weight:700;color:var(--text-quality);margin-bottom:8px;">❤️ WaitFor</h3>
-      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
         State Machine: <em>Starting → Running → Healthy</em>.<br>
-        <code style="color:var(--text-primary);">.WaitFor(x)</code> blockiert bis Healthy —<br>
-        nicht nur bis der Port offen ist.
+        <code style="color:var(--text-primary);">.WaitFor(x)</code> blockiert bis Healthy<br>
       </p>
     </div>
   </div>
   <aside class="notes">
-- Annotations: Builder ist ein reiner Konfigurations-Akkumulator — Build() ist der Moment wo alles zusammenkommt
+- Annotations-Builder
 - WithReference: der entscheidende Mechanismus — erklärt warum keine Ports hardcodiert sind
 - Service Discovery: ServiceEndpointResolver aus Aspire.ServiceDefaults — zeigen wie die Env Var aussieht
 - WaitFor: State Machine zeigt im Dashboard — Starting, Running, Healthy sichtbar
@@ -709,7 +700,7 @@ azd up    <span class="cm"># Infra + App provisionieren &amp; deployen</span></p
       <div class="card card-quality" style="padding:14px 18px;flex:1;">
         <ul class="bullet-list" style="gap:9px;">
           <li><span style="font-size:13px;">Aspire → Bicep: Container Apps, PostgreSQL Flexible Server, Service Bus</span></li>
-          <li><span style="font-size:13px;"><code>azd up</code> liest AppHost-Model — keine separate Infra-Konfiguration nötig</span></li>
+          <li><span style="font-size:13px;"><code>azd up</code> liest AppHost-Model</span></li>
           <li><span style="font-size:13px;">Azure Key Vault für Secrets, Azure Monitor für Telemetrie</span></li>
           <li><span style="font-size:13px;">Nicht alle Aspire-Ressourcen haben 1:1-Azure-Pendant</span></li>
         </ul>
@@ -735,7 +726,7 @@ aspire publish --output-path ./deploy/output
 docker compose -f ./deploy/output/docker-compose.yaml up</pre>
       <div class="card" style="flex:1;padding:12px 16px;">
         <ul class="bullet-list" style="gap:8px;">
-          <li><span style="font-size:13px;">Generiert: <code>docker-compose.yaml</code>, Dockerfiles, <code>.env</code> (leer — Secrets manuell füllen)</span></li>
+          <li><span style="font-size:13px;">Generiert: <code>docker-compose.yaml</code></li>
           <li><span style="font-size:13px;"><code>AddDockerfile</code> für non-.NET Container (nginx, Python, …)</span></li>
           <li><span style="font-size:13px;"><code>ConfigureComposeFile</code>: Healthchecks &amp; Restart-Policies nachträglich ergänzen</span></li>
         </ul>
@@ -744,12 +735,11 @@ docker compose -f ./deploy/output/docker-compose.yaml up</pre>
 
   </div>
   <aside class="notes">
-- Azure: azd (Azure Developer CLI) liest das AppHost-Model und generiert Bicep — keine separate Infra-Definition nötig
+- Azure: azd (Azure Developer CLI) liest das AppHost-Model und generiert Bicep
 - Container Apps für Services, Managed PostgreSQL, Service Bus für RabbitMQ-Ersatz
-- azd up: provision + deploy in einem Schritt — kein separates aspire build
+- Azure ist first-class citizen
+- nicht Teil der Demo
 - Docker Compose: AddDockerComposeEnvironment als Resource registrieren, dann aspire publish
-- Kein --output-format mehr seit Aspire 9.3 — Target ist Resource im AppHost
-- .env ist leer: Passwörter und Secrets manuell eintragen oder CI/CD-Secret-Store nutzen
 - ConfigureComposeFile: läuft nach der Generierung — hier Healthchecks, DependsOn-Conditions etc.
   </aside>
 </section>
@@ -780,9 +770,8 @@ helm upgrade --install cookiejar \
   ./deploy/output/kubernetes/</pre>
       <div class="card card-quality" style="flex:1;padding:12px 16px;">
         <ul class="bullet-list" style="gap:8px;">
-          <li><span style="font-size:13px;">Generiert vollständiges Helm-Chart inkl. <code>values.yaml</code></span></li>
-          <li><span style="font-size:13px;">Accessories als Deployments — für Produktion: externe Managed Services bevorzugen</span></li>
-          <li><span style="font-size:13px; color:var(--text-accent);">⚠️ Preview-Feature — Known Issues: Ingress, TLS, Secrets nicht fertig</span></li>
+          <li><span style="font-size:13px;">Generiert Helm-Chart und <code>values.yaml</code></span></li>
+          <li><span style="font-size:13px; color:var(--text-accent);">⚠️ Preview-Feature</span></li>
           <li><span style="font-size:13px;">Ausgabe ist Ausgangspunkt, kein produktionsfertiges Chart</span></li>
         </ul>
       </div>
@@ -792,7 +781,7 @@ helm upgrade --install cookiejar \
     <div style="display:flex;flex-direction:column;gap:10px;">
       <div style="display:flex;align-items:center;gap:10px;">
         <p style="font-size:14px;font-weight:700;color:var(--text-accent);">⚙️ Custom Provider — Kamal</p>
-        <span style="padding:3px 10px;border-radius:5px;background:rgba(243,145,37,0.12);border:1px solid rgba(243,145,37,0.3);font-size:10px;font-weight:700;color:var(--text-accent);letter-spacing:0.05em;">Demo 2</span>
+        <span style="padding:3px 10px;border-radius:5px;background:rgba(243,145,37,0.12);border:1px solid rgba(243,145,37,0.3);font-size:10px;font-weight:700;color:var(--text-accent);letter-spacing:0.05em;">Demo 3</span>
       </div>
       <pre style="font-size:10.5px;"><span class="cm">// AppHost.cs — eigenen PipelineStep registrieren</span>
 builder.<span class="ty">AddResource</span>(<span class="kw">new</span> <span class="ty">KamalDeploymentResource</span>(<span class="str">"kamal"</span>)
@@ -800,16 +789,15 @@ builder.<span class="ty">AddResource</span>(<span class="kw">new</span> <span cl
     ExtraSecretEnvVars = [<span class="str">"CookieJar__Capacity"</span>] })
   .<span class="ty">WithPipelineStepFactory</span>(<span class="ty">KamalPipelineStep</span>.Create);
 
-<span class="cm"># Kamal-Artifacts generieren (PUBLISH_TARGET=kamal):</span>
+<span class="cm"># Kamal-Artifacts generieren:</span>
 aspire publish --output-path ./deploy/output
 
 <span class="cm"># VM einrichten + deployen:</span>
-./deploy/kamal/3-deploy.sh all</pre>
+kamal deploy ...</pre>
       <div class="card" style="flex:1;padding:12px 16px;">
         <ul class="bullet-list" style="gap:8px;">
           <li><span style="font-size:13px;"><code>PipelineStep</code> walkt das Resource-Model: liest DB-Namen, User, Health-Check-Pfad aus Annotationen</span></li>
           <li><span style="font-size:13px;">Generiert <code>config/deploy.yml</code> + <code>.kamal/secrets.example</code></span></li>
-          <li><span style="font-size:13px;">Kein Kubernetes nötig — SSH + Docker reicht (Bare-Metal, Cloud-VMs)</span></li>
           <li><span style="font-size:13px;"><code>RequiredBySteps</code> statt <code>RequiredBy(Publish)</code> — läuft nur explizit</span></li>
         </ul>
       </div>
@@ -817,57 +805,50 @@ aspire publish --output-path ./deploy/output
 
   </div>
   <aside class="notes">
-- Kubernetes: AddKubernetesEnvironment → Helm-Chart via aspire publish — Preview seit ~13.x
-- Known Issues: Ingress-Resource fehlt, TLS nicht konfiguriert, Secrets als Plaintext in values.yaml — für Produktion nacharbeiten
+- Kubernetes: AddKubernetesEnvironment → Helm-Chart via aspire publish — Preview
+  - Known Issues: Ingress-Resource fehlt, etc. — für Produktion nacharbeiten
 - Accessories als Deployments im Helm-Chart — für Produktion besser: externe Managed Services (RDS, ElastiCache)
 - Kamal: von 37signals (Basecamp, Hey) — "deploy anywhere, no Kubernetes needed"
-- KamalDeploymentResource: Service-Name, Architektur, extra Secrets — alles in AppHost.cs konfiguriert, nicht hardcoded im Publisher
-- PipelineStep walkt das Resource-Model: liest PostgresServerResource.UserNameParameter, EndpointProbeAnnotation für Health-Check-Pfad
+- KamalDeploymentResource: Custom pipeline, konfigurierbar
 - Dockerfile-Container mit EndpointAnnotation (frontend, nginx) → HTTP-Accessory auf Port 3000; ohne Endpoint (cookie-sensor) → Worker-Accessory, kein Port, Connection Strings aus Secrets
-- RequiredBySteps = ["publish"] bedeutet: läuft MIT aspire publish — im Gegensatz zu requiredBy, das eigene Step-Namen braucht
-- 3-deploy.sh: löst ${VAR}-Platzhalter via sed auf, ruft kamal server bootstrap + proxy boot + accessory boot all + deploy --skip-push auf; gibt am Ende URLs aus
+- RequiredBySteps = ["publish"] bedeutet: läuft MIT aspire publish
   </aside>
 </section>
 
 <!-- ═══════════════════════════════════════════════
-     SLIDE 10: ASPIRE MCP (was 9)
+     SLIDE 10: ASPIRE MCP
 ═══════════════════════════════════════════════ -->
 <section class="slide">
-  <div class="fade-up label">Aspire MCP · kurz</div>
+  <div class="fade-up label">Aspire MCP</div>
   <h2 class="fade-up slide-title" style="margin-bottom:8px;">KI-Tooling mit Anwendungskontext</h2>
   <div class="fade-up rule"></div>
-  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;">
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <pre style="font-size:13px;"><span class="cm"># MCP-Server einrichten</span>
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;width:100%;align-items:stretch;">
+    <pre style="font-size:13px;"><span class="cm"># MCP-Server einrichten</span>
 aspire agent init
 
 <span class="cm"># → konfiguriert claude_desktop_config.json</span>
 <span class="cm"># → oder andere MCP-fähige KI-Tools</span></pre>
-      <div class="card card-quality" style="padding:18px 22px;">
-        <p style="font-size:14px;font-weight:700;color:var(--text-quality);margin-bottom:10px;">Was der MCP-Server bereitstellt</p>
-        <ul class="bullet-list" style="gap:9px;">
-          <li><span style="font-size:14px;">Laufende Ressourcen &amp; deren Status</span></li>
-          <li><span style="font-size:14px;">Structured Logs live abrufbar</span></li>
-          <li><span style="font-size:14px;">Traces &amp; Metrics</span></li>
-          <li><span style="font-size:14px;">Aspire Dokumentation durchsuchbar</span></li>
-        </ul>
-      </div>
+    <div class="card card-accent" style="padding:18px 22px;">
+      <p style="font-size:14px;font-weight:700;color:var(--text-accent);margin-bottom:10px;">Echter Mehrwert heute</p>
+      <ul class="bullet-list" style="gap:9px;">
+        <li><span style="font-size:14px;">Schnelles Onboarding: KI versteht die Architektur sofort</span></li>
+        <li><span style="font-size:14px;">Live-Diagnose (Logs): "Warum schlägt Service X fehl?"</span></li>
+        <li><span style="font-size:14px;">Testing: KI kann Ressourcen direkt abfragen</span></li>
+      </ul>
     </div>
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div class="card card-accent" style="padding:18px 22px;">
-        <p style="font-size:14px;font-weight:700;color:var(--text-accent);margin-bottom:10px;">Echter Mehrwert heute</p>
-        <ul class="bullet-list" style="gap:9px;">
-          <li><span style="font-size:14px;">Schnelles Onboarding: KI versteht die Architektur sofort</span></li>
-          <li><span style="font-size:14px;">Live-Diagnose: "Warum schlägt Service X fehl?"</span></li>
-          <li><span style="font-size:14px;">Testing: KI kann Ressourcen direkt abfragen</span></li>
-        </ul>
-      </div>
-      <div class="card" style="padding:16px 20px;">
-        <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
-          <strong style="color:var(--text-primary);">Fazit:</strong> MCP macht Aspire zum strukturierten Kontext-Provider für KI-Tools —
-          das ist der interessanteste Aspire-Trend 2026.
-        </p>
-      </div>
+    <div class="card card-quality" style="padding:18px 22px;">
+      <p style="font-size:14px;font-weight:700;color:var(--text-quality);margin-bottom:10px;">Was der MCP-Server bereitstellt</p>
+      <ul class="bullet-list" style="gap:9px;">
+        <li><span style="font-size:14px;">Laufende Ressourcen &amp; deren Status</span></li>
+        <li><span style="font-size:14px;">Structured Logs live abrufbar</span></li>
+        <li><span style="font-size:14px;">Traces &amp; Metrics</span></li>
+        <li><span style="font-size:14px;">Aspire Dokumentation durchsuchbar</span></li>
+      </ul>
+    </div>
+    <div class="card" style="padding:16px 20px;">
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
+        👉 MCP macht Aspire zum <strong>Kontext-Provider für Agenten</strong> 🤖
+      </p>
     </div>
   </div>
   <aside class="notes">
@@ -890,33 +871,37 @@ aspire agent init
 
     <!-- LEFT: Was funktioniert gut -->
     <div style="display:flex;flex-direction:column;gap:12px;">
-      <p style="font-size:15px;font-weight:700;color:var(--text-quality);">✅ Echter Mehrwert</p>
+      <p style="font-size:14px;font-weight:700;color:var(--text-quality);">✅ Echter Mehrwert</p>
       <div class="card card-quality" style="padding:16px 20px;flex:1;">
         <ul class="bullet-list" style="gap:11px;">
           <li><span style="font-size:14px;color:var(--text-primary);">Lokale Entwicklung — massiver Zeitgewinn, gesamter Stack mit einem Befehl</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Beschreibungssprache näher am Entwickler</span></li>
           <li><span style="font-size:14px;color:var(--text-primary);">Tech-Stack-Unabhängigkeit: Python, Node, Dockerfile — kein .NET-Zwang</span></li>
           <li><span style="font-size:14px;color:var(--text-primary);">Debugging verteilter Systeme: WaitFor, Replicas, Observability out-of-the-box</span></li>
-          <li><span style="font-size:14px;color:var(--text-primary);">Aspire MCP: Produktionsbugs lokal reproduzieren, Logs vergleichen — echter KI-Mehrwert</span></li>
-          <li><span style="font-size:14px;color:var(--text-primary);">Azure: <code style="color:var(--text-quality);">azd up</code> — First-Class-Citizen, kein Infra-Overhead</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Aspire MCP: Produktionsbugs lokal reproduzieren, Logs vergleichen — Kontext für Agenten</span></li>
         </ul>
       </div>
     </div>
 
     <!-- RIGHT: Deployment-Realität -->
     <div style="display:flex;flex-direction:column;gap:12px;">
-      <p style="font-size:15px;font-weight:700;color:var(--text-accent);">⚠️ Deployment-Realität</p>
+      <p style="font-size:14px;font-weight:700;color:var(--text-accent);">⚠️ Deployment-Realität</p>
       <div class="card card-accent" style="padding:16px 20px;flex:1;">
         <ul class="bullet-list" style="gap:11px;">
-          <li><span style="font-size:14px;color:var(--text-primary);">Docker Compose: verbessert sich, aber für echte Produktion noch Handarbeit (Secrets, TLS)</span></li>
+          <li><span style="font-size:14px;color:var(--text-primary);">Docker Compose: verbessert sich, aber für echte Produktion noch Handarbeit</span></li>
           <li><span style="font-size:14px;color:var(--text-primary);">Kubernetes: Preview — Helm-Output ist Ausgangspunkt, nicht Endprodukt</span></li>
           <li><span style="font-size:14px;color:var(--text-primary);">Custom Provider (Kamal): machbar — aber Aufwand sollte den Nutzen rechtfertigen</span></li>
           <li><span style="font-size:14px;color:var(--text-primary);">Außerhalb Azure gilt: Deployment nicht unterschätzen — Aspire allein reicht nicht</span></li>
         </ul>
       </div>
       <div class="card" style="padding:12px 16px;">
-        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
-          <strong style="color:var(--text-primary);">Fazit:</strong> Aspire ist für lokale Entwicklung &amp; Azure klar empfehlenswert.
-          Für andere Plattformen: Augen offen — es wird besser, ist aber noch nicht da.
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;">
+          <strong style="color:var(--text-primary);">Fazit:</strong><br/><br/>
+          <ul class="bullet-list" style="gap:11px;">
+            <li><span style="font-size:14px;color:var(--text-primary);">Aspire ist für lokale Entwicklung (&amp; Azure) klar empfehlenswert</span></li>
+            <li><span style="font-size:14px;color:var(--text-primary);">Für andere Plattformen: Augen offen — es wird besser, ist aber noch nicht da</span></li>
+            <li><span style="font-size:14px;color:var(--text-primary);">Custom Provider/Pipelines sind interessant für spezielle Szenarien</span></li>
+          </ul>
         </p>
       </div>
     </div>
