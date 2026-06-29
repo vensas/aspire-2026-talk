@@ -32,3 +32,4 @@ helm upgrade --install cookiejar "$HELM" \
   --set secrets.server.postgres_password="$POSTGRES_PASSWORD" \
   --set secrets.server.rabbitmq_password="$RABBITMQ_PASSWORD" \
   --set config.server.cookie_jar_capacity="$COOKIE_JAR_CAPACITY"
+

@@ -5,5 +5,5 @@ set -euo pipefail
 
 PORT="${PORT:-8080}"
 
-echo "Forwarding http://localhost:$PORT → frontend-service:80 (Ctrl+C to stop)"
-kubectl port-forward -n cookiejar svc/frontend-service "$PORT:80"
+echo "Forwarding http://localhost:$PORT → frontend-service:3000 (Ctrl+C to stop)"
+kubectl port-forward -n cookiejar svc/frontend-service "$PORT:3000"

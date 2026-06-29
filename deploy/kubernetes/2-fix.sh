@@ -21,5 +21,27 @@ echo "Fixing Helm output in $HELM..."
 find "$HELM/templates" -name "statefulset.yaml" -exec \
   sed -i '' 's/\(name: "[a-z0-9-]*\)\.\([a-z0-9][^"]*"\)/\1-\2/g' {} +
 
+# Add liveness + readiness probes to the server so Kubernetes restarts it when
+# it crashes before postgres is ready, instead of leaving a zombie Running pod.
+python3 - "$HELM/templates/server/deployment.yaml" <<'PYEOF'
+import sys, re
+path = sys.argv[1]
+text = open(path).read()
+probes = """\n          livenessProbe:
+            httpGet:
+              path: /alive
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10"""
+text = re.sub(r'(          imagePullPolicy: "[^"]*")', r'\1' + probes, text)
+open(path, 'w').write(text)
+PYEOF
+
 echo "Done."
 echo "Next: ./deploy/kubernetes/3-build.sh"

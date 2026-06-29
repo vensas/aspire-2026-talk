@@ -12,16 +12,15 @@ if [[ ! -d "$HELM" ]]; then
 fi
 
 echo "Building server image..."
+rm -rf "$ROOT/src/CookieJar.Server/obj/Release"
 dotnet publish "$ROOT/src/CookieJar.Server/CookieJar.Server.csproj" \
   /t:PublishContainer \
   -p ContainerRepository=server \
-  -p ContainerImageTag=latest \
-  --no-restore -q
+  -p ContainerImageTag=latest
 
 echo "Building cookie-sensor image..."
 podman build -q \
   -t localhost/cookie-sensor:latest \
-  -f "$HELM/cookie-sensor.Dockerfile" \
   "$ROOT/src/cookie-sensor"
 
 echo "Building frontend image..."
