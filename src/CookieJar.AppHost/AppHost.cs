@@ -66,6 +66,8 @@ var server = builder.AddProject<Projects.CookieJar_Server>("server")
     .WithReplicas(2)
     .WithExternalHttpEndpoints();
 
+server.WithUrl($"{server.GetEndpoint("http")}/scalar", "Scalar");
+
 if (builder.ExecutionContext.IsRunMode)
 {
     builder.AddViteApp("frontend", "../frontend")

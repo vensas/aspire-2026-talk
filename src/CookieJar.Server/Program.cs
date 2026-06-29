@@ -2,6 +2,7 @@ using CookieJar.Server;
 using CookieJar.Server.Data;
 using CookieJar.Server.Services;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,8 +26,8 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 
-if (app.Environment.IsDevelopment())
-    app.MapOpenApi();
+app.MapOpenApi();
+app.MapScalarApiReference();
 
 // Auto-migrate on startup
 await using (var scope = app.Services.CreateAsyncScope())
