@@ -18,9 +18,33 @@ env "Parameters__rabbitmq-password=placeholder" PUBLISH_TARGET=kamal \
 
 echo ""
 echo "Artifacts written to: $OUTPUT"
+
+# ── Seed secrets file with demo defaults ─────────────────────────────────────
+SECRETS="$OUTPUT/.kamal/secrets"
+VM_NAME="${VM_NAME:-kamal-demo}"
+REGISTRY_PORT="${REGISTRY_PORT:-5001}"
+
+VM_IP="$(multipass info "$VM_NAME" 2>/dev/null | awk '/IPv4/ { print $2 }')"
+HOST_IP="${VM_IP%.*}.1"
+REGISTRY_HOST="$HOST_IP:$REGISTRY_PORT"
+
+cat > "$SECRETS" <<EOF
+# .kamal/secrets — demo defaults, do not commit to version control.
+
+SERVER_IP=$VM_IP
+SSH_USER=ubuntu
+SSH_KEY=~/.ssh/kamal-multipass
+REGISTRY_HOST=$REGISTRY_HOST
+REGISTRY_USERNAME=unused
+REGISTRY_PASSWORD=unused
+ConnectionStrings__cookiejardb=Host=cookiejar-db;Port=5432;Database=cookiejardb;Username=postgres;Password=cookiejar
+ConnectionStrings__messaging=amqp://guest:cookiejar@cookiejar-mq:5672
+CookieJar__Capacity=100
+POSTGRES_PASSWORD=cookiejar
+RABBITMQ_DEFAULT_PASS=cookiejar
+EOF
+
+echo "Secrets written to: $SECRETS"
+echo "  SERVER_IP=$VM_IP  REGISTRY_HOST=$REGISTRY_HOST"
 echo ""
-echo "Next steps:"
-echo "  1. cp $OUTPUT/.kamal/secrets.example $OUTPUT/.kamal/secrets"
-echo "  2. Edit .kamal/secrets — fill in registry credentials and passwords"
-echo "  3. Edit deploy.yml — update server IP and domain"
-echo "  4. cd $OUTPUT && kamal setup && kamal deploy"
+echo "Next: ./deploy/kamal/2-build-push.sh"

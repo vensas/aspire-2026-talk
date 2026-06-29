@@ -134,8 +134,8 @@ cp deploy/output/kamal/.kamal/secrets.example deploy/output/kamal/.kamal/secrets
 # Edit secrets file — fill in SERVER_IP, passwords, connection strings
 
 ./deploy/kamal/2-build-push.sh  # build + push server, frontend, and cookie-sensor images
-./deploy/kamal/3-deploy.sh setup  # first time: installs Docker on the server
-./deploy/kamal/3-deploy.sh        # deploy / update (prints URLs when done)
+./deploy/kamal/3-setup.sh        # first time: installs Docker on the server
+./deploy/kamal/4-deploy.sh       # deploy / update (prints URLs when done)
 ```
 
 After a successful deploy:
@@ -181,24 +181,16 @@ $EDITOR deploy/output/kamal/.kamal/secrets
 ./deploy/kamal/2-build-push.sh
 
 # First-time provisioning (installs Docker on the VM, ~2 min)
-./deploy/kamal/3-deploy.sh setup
+./deploy/kamal/3-setup.sh
 
 # Deploy
-./deploy/kamal/3-deploy.sh
+./deploy/kamal/4-deploy.sh
 ```
 
 **Teardown:**
 
 ```bash
-# Remove all containers from the VM
-kamal remove --confirmed -c deploy/output/kamal/config/deploy.resolved.yml
-
-# Destroy the VM
-multipass stop kamal-demo
-multipass delete kamal-demo && multipass purge
-
-# Remove the local registry
-podman rm -f local-registry
+./deploy/kamal/5-teardown.sh
 ```
 
 ---
