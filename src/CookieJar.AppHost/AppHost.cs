@@ -9,9 +9,6 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 switch (Environment.GetEnvironmentVariable("PUBLISH_TARGET"))
 {
-    case "kubernetes":
-        builder.AddKubernetesEnvironment("kubernetes");
-        break;
     case "docker-compose":
         builder.AddDockerComposeEnvironment("docker-compose")
             .ConfigureComposeFile(compose =>
@@ -26,6 +23,9 @@ switch (Environment.GetEnvironmentVariable("PUBLISH_TARGET"))
                 };
                 compose.Services["cookie-sensor"].DependsOn["messaging"].Condition = "service_healthy";
             });
+        break;
+    case "kubernetes":
+        builder.AddKubernetesEnvironment("kubernetes");
         break;
     case "kamal":
         builder.AddResource(new KamalDeploymentResource("kamal")
