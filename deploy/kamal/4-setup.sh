@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # First-time server setup: installs Docker, configures the insecure registry,
 # boots the Kamal proxy, and starts accessories (postgres, rabbitmq).
-# Run from the repository root after 2-build-push.sh.
+# Run from the repository root after 3-build-push.sh.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -61,4 +61,4 @@ echo "=== [4/4] Starting accessories ==="
 "$KAMAL" accessory boot all $CONFIG
 
 echo ""
-echo "Setup complete. Run ./deploy/kamal/4-deploy.sh to deploy the app."
+echo "Setup complete. Run ./deploy/kamal/5-deploy.sh to deploy the app."

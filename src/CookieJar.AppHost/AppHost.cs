@@ -13,6 +13,14 @@ switch (Environment.GetEnvironmentVariable("PUBLISH_TARGET"))
         builder.AddDockerComposeEnvironment("docker-compose")
             .ConfigureComposeFile(compose =>
             {
+                compose.Services["postgres"].Healthcheck = new Healthcheck
+                {
+                    Test = ["CMD-SHELL", "pg_isready -U postgres"],
+                    Interval = "5s",
+                    Timeout = "5s",
+                    Retries = 5,
+                    StartPeriod = "10s",
+                };
                 compose.Services["messaging"].Healthcheck = new Healthcheck
                 {
                     Test = ["CMD", "rabbitmq-diagnostics", "-q", "ping"],
@@ -22,6 +30,8 @@ switch (Environment.GetEnvironmentVariable("PUBLISH_TARGET"))
                     StartPeriod = "30s",
                 };
                 compose.Services["cookie-sensor"].DependsOn["messaging"].Condition = "service_healthy";
+                compose.Services["server"].DependsOn["postgres"].Condition = "service_healthy";
+                compose.Services["server"].DependsOn["messaging"].Condition = "service_healthy";
             });
         break;
     case "kubernetes":
@@ -49,17 +59,16 @@ var postgres = builder.AddPostgres("postgres")
 var db = postgres.AddDatabase("cookiejardb");
 
 var rabbitmq = builder.AddRabbitMQ("messaging", password: rabbitPassword)
-    .WithManagementPlugin()
-    .WithDataVolume();
+    .WithManagementPlugin();
 
 builder.AddPythonApp("cookie-sensor", "../cookie-sensor", "sensor.py")
-    .WithReference(rabbitmq) // Injects RabbitMQ connection string into configuration
+    .WithReference(rabbitmq)
     .WaitFor(rabbitmq);
 
 var server = builder.AddProject<Projects.CookieJar_Server>("server")
     .WithReference(db)
     .WaitFor(db)
-    .WithReference(rabbitmq) // Injects RabbitMQ connection string into configuration
+    .WithReference(rabbitmq)
     .WaitFor(rabbitmq)
     .WithEnvironment("CookieJar__Capacity", capacity)
     .WithHttpHealthCheck("/health")

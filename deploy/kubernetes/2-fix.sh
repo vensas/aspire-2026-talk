@@ -21,8 +21,8 @@ echo "Fixing Helm output in $HELM..."
 find "$HELM/templates" -name "statefulset.yaml" -exec \
   sed -i '' 's/\(name: "[a-z0-9-]*\)\.\([a-z0-9][^"]*"\)/\1-\2/g' {} +
 
-# Add liveness + readiness probes to the server so Kubernetes restarts it when
-# it crashes before postgres is ready, instead of leaving a zombie Running pod.
+# Add liveness + readiness probes to the server — Aspire's Kubernetes provider
+# does not generate these from WithHttpHealthCheck yet (upstream gap).
 python3 - "$HELM/templates/server/deployment.yaml" <<'PYEOF'
 import sys, re
 path = sys.argv[1]

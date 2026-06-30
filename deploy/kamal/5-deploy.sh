@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Deploys the pre-pushed images to the server using Kamal.
-# Run from the repository root after 3-setup.sh (first time) or 2-build-push.sh (subsequent).
+# Run from the repository root after 4-setup.sh (first time) or 3-build-push.sh (subsequent).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"

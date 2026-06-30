@@ -18,4 +18,4 @@ cp "$ROOT/deploy/.env.template" "$OUTPUT/.env"
 
 echo ""
 echo "Artifacts written to: $OUTPUT"
-echo "Next: ./deploy/docker-compose/2-deploy.sh"
+echo "Next: ./deploy/docker-compose/2-fix.sh"

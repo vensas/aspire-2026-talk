@@ -14,4 +14,14 @@ fi
 
 echo "Stopping and removing Docker Compose stack (including volumes)..."
 docker compose -f "$COMPOSE" down --volumes --remove-orphans
+
+# Remove any orphaned cookiejar volumes left behind by interrupted runs.
+# RabbitMQ's .erlang.cookie gets bad permissions if a volume is reused after
+# a non-clean shutdown, so we always wipe them here.
+ORPHANS=$(docker volume ls -q | grep '^docker-compose_cookiejar\.' || true)
+if [[ -n "$ORPHANS" ]]; then
+  echo "Removing orphaned volumes: $ORPHANS"
+  echo "$ORPHANS" | xargs docker volume rm
+fi
+
 echo "Done."

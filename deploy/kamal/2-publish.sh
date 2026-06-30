@@ -47,4 +47,4 @@ EOF
 echo "Secrets written to: $SECRETS"
 echo "  SERVER_IP=$VM_IP  REGISTRY_HOST=$REGISTRY_HOST"
 echo ""
-echo "Next: ./deploy/kamal/2-build-push.sh"
+echo "Next: ./deploy/kamal/3-build-push.sh"

@@ -23,7 +23,6 @@ echo "Registry: $REGISTRY_HOST"
 
 # ── .NET server ───────────────────────────────────────────────────────────────
 echo "Building server image..."
-# Build into local podman — no registry flag means no push attempt by the SDK.
 dotnet publish "$ROOT/src/CookieJar.Server/CookieJar.Server.csproj" \
   /t:PublishContainer \
   -p ContainerRepository=cookiejar \
@@ -69,5 +68,5 @@ echo "  $REGISTRY_HOST/cookiejar:$GIT_SHA  (Kamal deploy tag)"
 echo "  $REGISTRY_HOST/cookiejar:latest"
 echo "  $REGISTRY_HOST/cookiejar-frontend:latest"
 echo "  $REGISTRY_HOST/cookiejar-cookie-sensor:latest"
-echo "Next: ./deploy/kamal/3-setup.sh setup   (first time)"
-echo "       ./deploy/kamal/4-deploy.sh         (subsequent deploys)"
+echo "Next: ./deploy/kamal/4-setup.sh   (first time)"
+echo "       ./deploy/kamal/5-deploy.sh  (subsequent deploys)"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Starts the Docker Compose stack from the generated artifacts.
-# Run from the repository root after 1-publish.sh.
+# Run from the repository root after 2-fix.sh.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
