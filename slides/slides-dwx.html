@@ -419,6 +419,7 @@
       <p style="font-size:14px;font-weight:700;color:var(--text-primary);text-align:center;">Aspire eigenständig</p>
       <p style="font-size:12px;color:var(--text-secondary);text-align:center;line-height:1.5;">Kein .NET-Lock-in<br>eigene Versionierung</p>
       <span style="padding:4px 12px;border-radius:4px;background:var(--color-accent);font-size:11px;font-weight:800;color:var(--color-black);letter-spacing:0.04em;">Heute · v 13.4</span>
+      <a href="https://aspire.dev" style="font-size:13px;color:var(--text-secondary);text-decoration:none;border-bottom:1px solid var(--slide-border);">aspire.dev</a>
     </div>
   </div>
   <aside class="notes">
@@ -601,26 +602,37 @@ dotnet user-secrets <span class="kw">set</span> \
   <h2 class="fade-up slide-title" style="margin-bottom:10px;">Wie Aspire intern funktioniert</h2>
   <div class="fade-up rule" style="margin-bottom:12px;"></div>
 
-  <!-- E: Dashboard — full-width banner -->
+  <!-- E: Runtime-Flow — full-width banner -->
   <div class="fade-up card" style="width:100%;padding:14px 22px;margin-bottom:12px;border-left-color:var(--color-trust);">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-      <span style="font-size:20px;">🖥️</span>
-      <h3 style="font-size:14px;font-weight:700;color:var(--text-trust);">Dashboard</h3>
-      <span style="font-size:12px;color:var(--text-secondary);font-weight:400;">— läuft im AppHost-Prozess, kein separater Service</span>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <span style="font-size:18px;">⚙️</span>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text-trust);">Laufzeit-Architektur</h3>
+      <span style="font-size:12px;color:var(--text-secondary);font-weight:400;">— AppHost übersetzt das Modell, DCP orchestriert die Ressourcen</span>
     </div>
-    <div style="display:flex;align-items:center;gap:0;flex-wrap:nowrap;">
-      <div style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--text-primary);white-space:nowrap;">Services</div>
-      <div style="display:flex;flex-direction:column;align-items:stretch;padding:0 12px;gap:4px;">
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:14px;color:var(--text-secondary);">→</span>
-          <span style="font-size:11px;color:var(--text-secondary);">OTLP — Logs, Traces, Metrics</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:14px;color:var(--text-secondary);">⇄</span>
-          <span style="font-size:11px;color:var(--text-secondary);">gRPC (DCP) — Status, Console-Output, Commands</span>
-        </div>
+    <div style="display:flex;align-items:center;gap:0;flex-wrap:nowrap;justify-content:center;">
+      <!-- AppHost -->
+      <div style="background:var(--slide-bg-card);border:1px solid var(--color-trust);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--text-trust);white-space:nowrap;">AppHost<br><span style="font-weight:400;color:var(--text-secondary);">.NET</span></div>
+      <!-- AppHost → DCP -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:0 12px;gap:2px;">
+        <span style="font-size:14px;color:var(--text-secondary);">⇄</span>
+        <a href="https://www.nuget.org/packages/KubernetesClient" target="_blank" style="font-size:10px;color:var(--text-secondary);text-decoration:underline;text-underline-offset:2px;">KubernetesClient</a>
       </div>
-      <div style="background:var(--slide-bg-card);border:1px solid var(--color-trust);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--text-trust);white-space:nowrap;">AppHost</div>
+      <!-- DCP -->
+      <div style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--text-primary);white-space:nowrap;">DCP<br><span style="font-weight:400;color:var(--text-secondary);">Go-Binary</span></div>
+      <!-- DCP → Resources -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:0 12px;gap:2px;">
+        <span style="font-size:14px;color:var(--text-secondary);">→</span>
+        <span style="font-size:10px;color:var(--text-secondary);">startet &amp; überwacht</span>
+      </div>
+      <!-- Resources -->
+      <div style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--text-primary);white-space:nowrap;">Resources<br><span style="font-weight:400;color:var(--text-secondary);">Container / Prozesse</span></div>
+      <!-- Resources → Dashboard -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:0 12px;gap:2px;">
+        <span style="font-size:14px;color:var(--text-secondary);">→</span>
+        <span style="font-size:10px;color:var(--text-secondary);">OTLP / gRPC</span>
+      </div>
+      <!-- Dashboard -->
+      <div style="background:var(--slide-bg-card);border:1px solid var(--color-trust);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--text-trust);white-space:nowrap;">🖥️ Dashboard<br><span style="font-weight:400;color:var(--text-secondary);">separater Container</span></div>
     </div>
   </div>
 
@@ -654,12 +666,16 @@ dotnet user-secrets <span class="kw">set</span> \
       </p>
     </div>
   </div>
+  <div class="fade-up" style="width:100%;text-align:right;margin-top:6px;">
+    <a href="https://aspire.dev/architecture/overview/" style="font-size:10px;color:var(--text-secondary);text-decoration:none;border-bottom:1px solid var(--slide-border);opacity:0.7;">aspire.dev/architecture/overview</a>
+  </div>
   <aside class="notes">
 - Annotations-Builder
 - WithReference: der entscheidende Mechanismus — erklärt warum keine Ports hardcodiert sind
 - Service Discovery: ServiceEndpointResolver aus Aspire.ServiceDefaults — zeigen wie die Env Var aussieht
 - WaitFor: State Machine zeigt im Dashboard — Starting, Running, Healthy sichtbar
-- Dashboard: Backchannel ist auch die Basis für aspire publish und MCP — der rote Faden
+- DCP: Go-Binary (dcp + dcpctrl), Kubernetes-ähnliche API (HTTP/2 + Protobuf via KubernetesClient) — KEIN gRPC im klassischen Sinn
+- Dashboard: separater Container, empfängt OTLP über gRPC (Port 18889) direkt von den Services
   </aside>
 </section>
 
@@ -911,36 +927,37 @@ aspire agent init  <span class="cm"># konfiguriert claude_desktop_config.json od
   <div class="fade-up label" style="text-align:center;">Fragen?</div>
   <h2 class="fade-up" style="font-size:52px;font-weight:800;color:var(--text-primary);line-height:1.1;margin-top:12px;margin-bottom:36px;">Danke!</h2>
 
-  <div class="fade-up" style="display:grid;grid-template-columns:1fr 1fr;width:100%;max-width:820px;align-items:center;">
-    <!-- QR Code -->
-    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div class="fade-up" style="display:grid;grid-template-columns:180px 280px 180px;gap:40px;align-items:center;justify-content:center;">
+    <!-- DWX Feedback QR -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
       <img src="dwx-feedback-qr-code.png" alt="DWX Feedback QR Code"
-           style="width:210px;height:210px;border-radius:10px;background:#fff;padding:8px;">
-      <p style="font-size:15px;font-weight:600;color:var(--text-trust);">Feedback?</p>
+           style="width:170px;height:170px;border-radius:10px;background:#fff;padding:8px;">
+      <p style="font-size:13px;font-weight:600;color:var(--text-trust);">Feedback?</p>
     </div>
 
     <!-- Contact info -->
-    <div style="display:flex;flex-direction:column;gap:16px;text-align:left;">
+    <div style="display:flex;flex-direction:column;justify-content:center;gap:16px;">
       <div class="contact-row">
         <svg style="width:18px;height:18px;flex-shrink:0;opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        <a href="https://vensas.de" class="contact-link" style="font-size:17px;">vensas.de</a>
+        <a href="https://vensas.de" class="contact-link" style="font-size:16px;">vensas.de</a>
       </div>
       <div class="contact-row">
         <svg style="width:18px;height:18px;flex-shrink:0;opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
-        <a href="mailto:kontakt@vensas.de" class="contact-link" style="font-size:17px;">kontakt@vensas.de</a>
-      </div>
-      <div class="contact-row">
-        <svg style="width:18px;height:18px;flex-shrink:0;opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.77 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.69a16 16 0 0 0 5.93 5.93l1.05-1.06a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        <a href="tel:+4968130984780" class="contact-link" style="font-size:17px;">+49 (0)681 30984780</a>
+        <a href="mailto:sven.hennessen@vensas.de" class="contact-link" style="font-size:16px;">sven.hennessen@vensas.de</a>
       </div>
       <div class="contact-row">
         <svg style="width:18px;height:18px;flex-shrink:0;opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-        <a href="https://linkedin.com/company/vensas-gmbh" class="contact-link" style="font-size:17px;">linkedin.com/company/vensas-gmbh</a>
+        <a href="https://linkedin.com/in/svenhennessen" class="contact-link" style="font-size:16px;">linkedin.com/in/svenhennessen</a>
       </div>
-      <div class="contact-row">
-        <svg style="width:18px;height:18px;flex-shrink:0;opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-        <a href="https://github.com/vensas" class="contact-link" style="font-size:17px;">github.com/vensas</a>
-      </div>
+    </div>
+
+    <!-- GitHub repo QR -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+      <a href="https://github.com/vensas/aspire-2026-talk" target="_blank">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAAFKAQAAAABTUiuoAAACmUlEQVR4nO1bwY3jMAwc0gLytIEUkFKUDq6kw5a0HdilpIAFrGeAGFyQlJy8DrlPLEDSQ5BjPghRwxnRDAneHAu/awl0U+6bhX5ckCiPayLCMgF0NTBRQHkVOmBQQcoIAIaHLcmmeCN4dozrGYizLtO5Bl+5m8Ji5OgZHzBsOawMYIY8X3HfLNR0slJQRNlyI/m6PD7twL8Ho3XT8PowagpMmhPHn/AhB7ib4j83S0QMRxt5Ooy3kzjUMIqIcRf6vnINJ2tz3Qekk9A1aaCUy/5qTlzs1VSNr22bhpz/bKSNZJkG1YR3R5nU5Cs3bwqRdRDPfz5hEERLjKP4SmYMInPfLD76uMAoy5jJ6SmKxcjYSsOogdKASo8WqoiWDtftdifW8JTfZFaAudTgo33l5k1hcXEIzS9Q03S47sHr2KrjuASbZbluhCil/ORa3ktSd0KcdXG4r9y8KV6wZbDyR0t9rjJ25HHzm8U17MCmsLprDT4X3UXWzR8/48Cbg9G6KbKYMPQURfGksbzqKqOOaIWyMKIiZTCd/qxKXspbaSKpxFdu3hSFrcqly/Wf05iRV74nS+ct1FLLiDY9VYYr+Hw7zpdlPtpXbt40eDlwudxJkM5aeT8/EL+nXI3vm1Ubb20B8Rb0q9adZLkO5V2adkKrwtduilJmKuUnT4d7BSOXpPp9q5bj8ux58jKu9jyVDg1rychSgyvwtXFTZAhZ5d3k4POzScFWVod8tK/cTfHa86TfINNJFfxGNhFNg/R+wiqPS8ptapb/iC52B9u0EFWfr90URlRWNtRhrTSjSO8nrLLnaSwFjS8XGCbe985CrsNXtH7fovyQzkL6E2HUdicNWVz3Tho+2ldu3pT6P4LQj8vbg7sp3h6/VmyUjtYSbLIAAAAASUVORK5CYII=" alt="GitHub Repo QR Code"
+             style="width:170px;height:170px;border-radius:10px;background:#fff;padding:8px;">
+      </a>
+      <a href="https://github.com/vensas/aspire-2026-talk" target="_blank" class="contact-link" style="font-size:13px;font-weight:600;color:var(--text-primary);text-align:center;">github.com/vensas/aspire-2026-talk</a>
     </div>
   </div>
   <aside class="notes">
