@@ -27,6 +27,7 @@ Made with the vensas-doc-generator (`../vensas-doc-generator`), like `../playwri
 - The screenshots in `docs/img/` are real (dashboard and frontend from `aspire run`, test output from the test runs). Make them again after a visual change.
 - The two customer-project slides carry the kicker `label: From a real project` on their first `heading` block and end with a `Recommendation` callout. Keep them anonymized.
 - No `Demo` callouts on the slides — the demo commands are in the speaker notes.
+- The IT-Tage audience does not know the DWX talk. Do not tell a migration story (no "custom step → package", no "bug fixed since", no line counts of removed code). Aspire.Hosting.Testing and `Vensas.Aspire.Hosting.Kamal` are simply how the demo works.
 - Watch the slide width: a code line longer than about 60 characters in a half-width column overflows.
 
 ### Services

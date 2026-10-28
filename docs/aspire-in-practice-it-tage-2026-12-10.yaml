@@ -155,8 +155,8 @@ slides:
         alt: The parameters tab in the dashboard. cookie-jar-capacity is 100, rabbitmq-password is hidden.
       - type: callout
         variant: warning
-        title: A trap that a test found
-        text: AddParameter(name, "100") is a constant. Aspire then ignores the configuration.
+        title: Watch out
+        text: AddParameter(name, "100") sets a constant value. Aspire then ignores the configuration. Read the configuration first, as above.
 - id: internals
   layout: content
   title: How Aspire works
@@ -234,9 +234,9 @@ slides:
     variant: info
     title: Recommendation
     text: Remove the data volume in the test. Each run then starts with an empty database.
-- id: tests-found-bugs
+- id: replicas-in-tests
   layout: content
-  title: The tests found two bugs
+  title: Two replicas in the test
   blocks:
   - type: columns
     widths:
@@ -246,11 +246,13 @@ slides:
     - - type: box
         items:
         - label: Parameter
-          text: The test expected capacity 42 and got 100. AddParameter(name, "100") was a constant. Fixed.
+          text: The test gives capacity 42 as an argument. A refill must return 42.
+        - label: Migration
+          text: Both replicas start at the same time. An advisory lock lets only one of them migrate.
         - label: SSE
-          text: Each replica streams only the events that it consumed. Open on purpose.
+          text: Each replica streams only the events that it consumed. The explicit test shows this limit.
       - type: text
-        text: With one instance you see neither bug. With WithReplicas(2) in the test you see both at once.
+        text: One instance hides these problems. With WithReplicas(2) the test shows them.
     - - type: image
         src: img/test-output.png
         alt: 'Terminal. dotnet test passes 6 tests. The explicit SSE test fails: expected 100, 99, 98, 97, 96, actual 100, 99, 98.'
@@ -395,9 +397,9 @@ slides:
           server.PublishAsKamalService((_, config) =>
               config.Proxy!.Healthcheck =
                   new() { Path = "/health" });
-- id: kamal-package
+- id: kamal-mapping
   layout: content
-  title: From a custom step to a NuGet package
+  title: 'Kamal: from the app model to deploy.yml'
   blocks:
   - type: columns
     widths:
@@ -416,11 +418,11 @@ slides:
           value: ".kamal/secrets, references only"
         - key: WithReference(server)
           value: Network alias server-web
-      - type: stats
-        items:
-        - value: "−340"
-          label: lines of custom code removed from the demo
-          variant: accent
+      - type: code
+        language: bash
+        code: 'dotnet add package Vensas.Aspire.Hosting.Kamal
+
+          '
     - - type: code
         language: yaml
         filename: deploy/output/kamal/config/deploy.yml
@@ -477,7 +479,7 @@ slides:
     - title: Use Aspire for local development now.
       text: The full stack with one command, in any language, with OpenTelemetry.
     - title: Test with the real AppHost and two replicas.
-      text: Aspire.Hosting.Testing found two bugs that one instance hides.
+      text: Aspire.Hosting.Testing shows the problems that one instance hides.
     - title: Outside Azure, plan time for the deployment.
       text: Compose and Helm are a start. Kamal shows that the provider model works.
     - title: 'AI: give the agent the running app with Aspire MCP.'
