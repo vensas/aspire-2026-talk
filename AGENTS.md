@@ -15,7 +15,19 @@ A small distributed app that tracks the fill level of an office cookie jar in re
 | Event | Slides | Demo state |
 |---|---|---|
 | DWX 2026 (30.06.2026) | `slides/slides-dwx.html` | git tag `dwx-2026` (Aspire 13.4.6, custom Kamal pipeline step) — DO NOT modify the DWX slides |
-| IT-Tage 2026 (Do 10.12.2026, 09:00–09:45, Frankfurt) | `slides/slides-ittage.html` | current `src/` (Aspire 13.6.4, `Vensas.Aspire.Hosting.Kamal`, `CookieJar.Tests`) |
+| IT-Tage 2026 (Do 10.12.2026, 09:00–09:45, Frankfurt) | `docs/aspire-in-practice-it-tage-2026-12-10.yaml` → `.pdf` (English, ASD-STE100), speaker notes in `docs/aspire-in-practice-it-tage-2026-12-10-notes.md` | current `src/` (Aspire 13.6.4, `Vensas.Aspire.Hosting.Kamal`, `CookieJar.Tests`) |
+
+### IT-Tage deck (`docs/`)
+
+Made with the vensas-doc-generator (`../vensas-doc-generator`), like `../playwright-2026-talk`, which is the reference for the look. Run `./generate-docs.sh` after each change to the YAML and look at the generated PDF pages.
+
+- Write the slides in ASD-STE100 (Simplified Technical English). One idea per sentence.
+- The YAML is the only source; the PDF is generated. The generator rewrites the YAML on each run (it removes comments) — edit it with a YAML parser, not with a text search.
+- Put an image in a `columns` block beside the content, with an `alt`. `widths: [6, 4]` for a narrow image, `[4, 6]` for a wide one. Crop screenshots to the part that matters.
+- The screenshots in `docs/img/` are real (dashboard and frontend from `aspire run`, test output from the test runs). Make them again after a visual change.
+- The two customer-project slides carry the kicker `label: From a real project` on their first `heading` block and end with a `Recommendation` callout. Keep them anonymized.
+- No `Demo` callouts on the slides — the demo commands are in the speaker notes.
+- Watch the slide width: a code line longer than about 60 characters in a half-width column overflows.
 
 ### Services
 

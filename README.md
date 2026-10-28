@@ -1,19 +1,20 @@
-# .NET Aspire in der Praxis — IT-Tage 2026
+# Aspire in Practice — IT-Tage 2026
 
 Talk repository for **Sven Hennessen** @ [IT-Tage 2026](https://ittage.informatik-aktuell.de), Frankfurt am Main — Donnerstag, 10. Dezember 2026, 09:00–09:45.
 
-> **Von lokaler Entwicklung über Tests bis zum Deployment** — Hands-on mit .NET Aspire 13.6: AppHost, Aspire.Hosting.Testing, Deployment-Targets (Docker Compose, Kubernetes, Kamal via [Vensas.Aspire.Hosting.Kamal](https://github.com/vensas/aspire-hosting-kamal)) und Aspire MCP.
+> **From local development to tests and deployment** — hands-on with Aspire 13.6: AppHost, Aspire.Hosting.Testing, deployment targets (Docker Compose, Kubernetes, Kamal via [Vensas.Aspire.Hosting.Kamal](https://github.com/vensas/aspire-hosting-kamal)) and Aspire MCP.
 
 | Talk | Slides | Demo code |
 |---|---|---|
-| IT-Tage 2026 | `slides/slides-ittage.html` | this branch (Aspire 13.6.4) |
-| [DWX Developer World 2026](https://www.developer-week.de), 30. Juni 2026 | `slides/slides-dwx.html` | git tag [`dwx-2026`](../../tree/dwx-2026) (Aspire 13.4.6, custom Kamal pipeline step) |
+| IT-Tage 2026 (English) | [`docs/aspire-in-practice-it-tage-2026-12-10.pdf`](docs/aspire-in-practice-it-tage-2026-12-10.pdf), source [`docs/aspire-in-practice-it-tage-2026-12-10.yaml`](docs/aspire-in-practice-it-tage-2026-12-10.yaml), [speaker notes](docs/aspire-in-practice-it-tage-2026-12-10-notes.md) | this branch (Aspire 13.6.4) |
+| [DWX Developer World 2026](https://www.developer-week.de), 30. Juni 2026 (German) | `slides/slides-dwx.html` | git tag [`dwx-2026`](../../tree/dwx-2026) (Aspire 13.4.6, custom Kamal pipeline step) |
 
 ## Repository structure
 
 | Path | What's in it |
 |---|---|
-| `slides/` | HTML slide decks (`slides-ittage.html`, `slides-dwx.html`) — open in a browser, navigate with arrow keys, press `S` for speaker notes |
+| `docs/` | IT-Tage deck: YAML source, generated PDF, speaker notes, screenshots in `docs/img/` — made with [vensas-doc-generator](https://github.com/vensas/vensas-doc-generator) via `./generate-docs.sh` |
+| `slides/` | DWX deck (`slides-dwx.html`) — open in a browser, navigate with arrow keys, press `S` for speaker notes |
 | `src/` | The CookieJar demo application (Aspire AppHost + all services) and `CookieJar.Tests` |
 | `deploy/` | Deployment scripts and generated artifacts for Docker Compose, Kubernetes, and Kamal |
 
@@ -104,3 +105,13 @@ dotnet user-secrets set "Parameters:cookie-jar-capacity" "80" \
 ```
 
 The value is injected into the server as the `CookieJar__Capacity` environment variable and bound to `CookieJarOptions.Capacity`.
+
+## Slides
+
+The IT-Tage deck is YAML for the [vensas-doc-generator](https://github.com/vensas/vensas-doc-generator), which must be checked out beside this repository (or set `DOC_GENERATOR_DIR`):
+
+```sh
+./generate-docs.sh       # docs/aspire-in-practice-it-tage-2026-12-10.yaml → .pdf
+```
+
+The screenshots in `docs/img/` are real: the Aspire dashboard and the frontend from `aspire run`, and the test output from `dotnet test` and `dotnet run --project src/CookieJar.Tests -- -explicit only`.
