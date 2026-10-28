@@ -1,7 +1,4 @@
 using Aspire.Hosting.Docker.Resources.ServiceNodes;
-using Aspire.Hosting.Pipelines;
-using CookieJar.AppHost.Publishing;
-
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -38,19 +35,33 @@ switch (Environment.GetEnvironmentVariable("PUBLISH_TARGET"))
         builder.AddKubernetesEnvironment("kubernetes");
         break;
     case "kamal":
-        builder.AddResource(new KamalDeploymentResource("kamal")
-        {
-            ServiceName = "cookiejar",
-            Architecture = "arm64",
-            ExtraSecretEnvVars = ["CookieJar__Capacity"],
-        }).WithPipelineStepFactory(KamalPipelineStep.Create);
+        // Target VM and registry are passed in by deploy/kamal/2-publish.sh (Multipass VM, local registry)
+        var kamalServer = builder.Configuration["KAMAL_SERVER"] ?? "192.168.64.2";
+        builder.AddKamalEnvironment("kamal")
+            .WithServers(kamalServer)
+            .WithRegistry(builder.Configuration["KAMAL_REGISTRY"] ?? "192.168.64.1:5001", "unused")
+            .WithProxyHostSuffix($"{kamalServer}.nip.io")
+            .WithProperties(kamal =>
+            {
+                kamal.SshUser = "ubuntu";
+                kamal.BuilderArch = "arm64";
+                kamal.ImageNamespace = "cookiejar";
+            })
+            .ConfigureDeployConfig(config =>
+            {
+                // Local VM without a public domain — no Let's Encrypt
+                if (config.Proxy is not null)
+                    config.Proxy.Ssl = false;
+            });
         break;
 }
 
 #endregion
 
 var rabbitPassword = builder.AddParameter("rabbitmq-password", secret: true);
-var capacity = builder.AddParameter("cookie-jar-capacity", "100");
+// AddParameter(name, value) would be a constant — read configuration first, fall back to 100
+var capacity = builder.AddParameter("cookie-jar-capacity",
+    builder.Configuration["Parameters:cookie-jar-capacity"] ?? "100", publishValueAsDefault: true);
 
 var postgres = builder.AddPostgres("postgres")
     .WithPgAdmin()
@@ -61,10 +72,6 @@ var db = postgres.AddDatabase("cookiejardb");
 var rabbitmq = builder.AddRabbitMQ("messaging", password: rabbitPassword)
     .WithManagementPlugin();
 
-builder.AddPythonApp("cookie-sensor", "../cookie-sensor", "sensor.py")
-    .WithReference(rabbitmq)
-    .WaitFor(rabbitmq);
-
 var server = builder.AddProject<Projects.CookieJar_Server>("server")
     .WithReference(db)
     .WaitFor(db)
@@ -73,9 +80,15 @@ var server = builder.AddProject<Projects.CookieJar_Server>("server")
     .WithEnvironment("CookieJar__Capacity", capacity)
     .WithHttpHealthCheck("/health")
     .WithReplicas(2)
-    .WithExternalHttpEndpoints();
+    .WithExternalHttpEndpoints()
+    .PublishAsKamalService((_, config) => config.Proxy!.Healthcheck = new() { Path = "/health" });
 
 server.WithUrl($"{server.GetEndpoint("http")}/scalar", "Scalar");
+
+// Declared after the server: Kamal makes the first app the primary one that owns all accessories
+builder.AddPythonApp("cookie-sensor", "../cookie-sensor", "sensor.py")
+    .WithReference(rabbitmq)
+    .WaitFor(rabbitmq);
 
 if (builder.ExecutionContext.IsRunMode)
 {
@@ -89,7 +102,8 @@ else
         .WithHttpEndpoint(port: 3000, targetPort: 80)
         .WithEnvironment("SERVER_URL", server.GetEndpoint("http"))
         .WithExternalHttpEndpoints()
-        .WaitFor(server);
+        .WaitFor(server)
+        .PublishAsKamalService((_, config) => config.Proxy!.Healthcheck = new() { Path = "/" });
 }
 
 await builder.Build().RunAsync();
