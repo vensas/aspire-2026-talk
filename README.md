@@ -1,15 +1,20 @@
-# .NET Aspire in der Praxis — DWX 2026
+# .NET Aspire in der Praxis — IT-Tage 2026
 
-Talk repository for **Sven Hennessen** @ [DWX Developer World 2026](https://www.developer-week.de), 30. Juni 2026.
+Talk repository for **Sven Hennessen** @ [IT-Tage 2026](https://ittage.informatik-aktuell.de), Frankfurt am Main — Donnerstag, 10. Dezember 2026, 09:00–09:45.
 
-> **Von lokaler Entwicklung bis zum Deployment** — Hands-on mit .NET Aspire 13.4: AppHost, Deployment-Targets, Custom Pipeline Steps, und Aspire MCP.
+> **Von lokaler Entwicklung über Tests bis zum Deployment** — Hands-on mit .NET Aspire 13.6: AppHost, Aspire.Hosting.Testing, Deployment-Targets (Docker Compose, Kubernetes, Kamal via [Vensas.Aspire.Hosting.Kamal](https://github.com/vensas/aspire-hosting-kamal)) und Aspire MCP.
+
+| Talk | Slides | Demo code |
+|---|---|---|
+| IT-Tage 2026 | `slides/slides-ittage.html` | this branch (Aspire 13.6.4) |
+| [DWX Developer World 2026](https://www.developer-week.de), 30. Juni 2026 | `slides/slides-dwx.html` | git tag [`dwx-2026`](../../tree/dwx-2026) (Aspire 13.4.6, custom Kamal pipeline step) |
 
 ## Repository structure
 
 | Path | What's in it |
 |---|---|
-| `slides/` | HTML slide deck (`slides-dwx.html`) — open in a browser, navigate with arrow keys, press `S` for speaker notes |
-| `src/` | The CookieJar demo application (Aspire AppHost + all services) |
+| `slides/` | HTML slide decks (`slides-ittage.html`, `slides-dwx.html`) — open in a browser, navigate with arrow keys, press `S` for speaker notes |
+| `src/` | The CookieJar demo application (Aspire AppHost + all services) and `CookieJar.Tests` |
 | `deploy/` | Deployment scripts and generated artifacts for Docker Compose, Kubernetes, and Kamal |
 
 ## The demo — CookieJar
@@ -50,6 +55,29 @@ dotnet run --project CookieJar.AppHost
 
 Aspire will start all resources, run database migrations, and open the dashboard automatically.
 
+## Tests — Aspire.Hosting.Testing
+
+`src/CookieJar.Tests` starts the real AppHost from xUnit v3 (Docker or Podman required):
+
+```sh
+dotnet test src/CookieJar.Tests
+```
+
+| Test | What it checks |
+|---|---|
+| `AppModelTests.*` | App model only, no containers (< 1 s): server runs 2 replicas with a health check, waits for `cookiejardb` and `messaging`, the capacity parameter reads configuration |
+| `CookieJarTests.Refill_SetsLevelToCapacityParameter` | `POST /refill` returns the capacity passed in as `Parameters:cookie-jar-capacity=42` |
+| `CookieJarTests.CookieTakenEvent_LowersLevel_OnBothReplicas` | A `cookie-taken` message published to RabbitMQ lowers the level, and both server replicas see it |
+| `CookieJarTests.LevelStream_OnEveryReplica_ReceivesEveryChange` | **Explicit, fails on purpose:** SSE subscriptions are in-memory per replica, so each replica only streams the events it consumed itself |
+
+The fixture removes PgAdmin, the frontend and the cookie sensor (incl. their npm/pip installer resources), drops the Postgres data volume, and passes parameters as arguments — no user secrets needed.
+
+Run the explicit test to show the SSE bug:
+
+```sh
+dotnet run --project src/CookieJar.Tests -- -explicit only
+```
+
 ## Deployment
 
 Docker Compose, Kubernetes (Helm), and Kamal deployment are covered in [deploy/README.md](deploy/README.md).
@@ -67,7 +95,7 @@ dotnet user-secrets set "Parameters:rabbitmq-password" "<password>" \
 
 ### Cookie jar capacity (plain parameter)
 
-Maximum fill level after a refill. Defaults to `100` when not set. Override via `dotnet user-secrets` or any configuration source:
+Maximum fill level after a refill. Defaults to `100` when not set. Override via `dotnet user-secrets` or any configuration source (the DWX version used `AddParameter(name, "100")`, which is a constant and silently ignored this override):
 
 ```sh
 dotnet user-secrets set "Parameters:cookie-jar-capacity" "80" \

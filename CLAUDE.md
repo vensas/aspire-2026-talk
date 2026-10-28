@@ -8,7 +8,14 @@ DO NOT include the content of `CLAUDE.md` in the presentation outline.
 
 A small distributed app that tracks the fill level of an office cookie jar in real time. UI and labels are in German. Three languages/runtimes to demonstrate Aspire's tech-stack independence.
 
-`src/` contains the Aspire demo app (Aspire SDK 13.4.6, net10.0). `aspire.config.json` in `src/` points the Aspire CLI at the AppHost.
+`src/` contains the Aspire demo app (Aspire SDK 13.6.4, net10.0). `aspire.config.json` in `src/` points the Aspire CLI at the AppHost.
+
+### Talk versions
+
+| Event | Slides | Demo state |
+|---|---|---|
+| DWX 2026 (30.06.2026) | `slides/slides-dwx.html` | git tag `dwx-2026` (Aspire 13.4.6, custom Kamal pipeline step) — DO NOT modify the DWX slides |
+| IT-Tage 2026 (Do 10.12.2026, 09:00–09:45, Frankfurt) | `slides/slides-ittage.html` | current `src/` (Aspire 13.6.4, `Vensas.Aspire.Hosting.Kamal`, `CookieJar.Tests`) |
 
 ### Services
 
@@ -16,6 +23,7 @@ A small distributed app that tracks the fill level of an office cookie jar in re
 |---|---|---|---|
 | `CookieJar.AppHost` | `src/CookieJar.AppHost` | Aspire AppHost | Wires all resources; publish targets |
 | `CookieJar.Server` | `src/CookieJar.Server` | ASP.NET Core + EF Core | REST + SSE API, PostgreSQL, RabbitMQ consumer |
+| `CookieJar.Tests` | `src/CookieJar.Tests` | xUnit v3 + Aspire.Hosting.Testing | App-model tests and E2E tests against the real AppHost |
 | `frontend` | `src/frontend` | React + Vite | Live fill-level display; refill button |
 | `cookie-sensor` | `src/cookie-sensor` | Python + pika | Simulates cookies being taken |
 | `postgres` | — | PostgreSQL + PgAdmin | Persistent state |
@@ -40,16 +48,19 @@ record CookieJarState { int Id; int Level; DateTime LastUpdated; }
 | `GET` | `/alive` | Liveness check (`live`-tagged checks only) |
 | `GET` | `/scalar` | Scalar API reference UI |
 
-SSE is powered by in-memory `Channel<int>` subscriptions in `CookieJarService` — no SignalR or external broker involved.
+SSE is powered by in-memory `Channel<int>` subscriptions in `CookieJarService` — no SignalR or external broker involved. Known limitation (kept on purpose for the talk): with 2 replicas, only the replica that consumed a RabbitMQ event notifies its own SSE clients. `LevelStream_OnEveryReplica_ReceivesEveryChange` is an `Explicit` test that demonstrates it.
 
 ### Capacity parameter
 
 `CookieJar__Capacity` env var → bound to `CookieJarOptions.Capacity` (default 100). Injected by the AppHost:
 
 ```csharp
-var capacity = builder.AddParameter("cookie-jar-capacity", "100");
+var capacity = builder.AddParameter("cookie-jar-capacity",
+    builder.Configuration["Parameters:cookie-jar-capacity"] ?? "100", publishValueAsDefault: true);
 server.WithEnvironment("CookieJar__Capacity", capacity);
 ```
+
+Do NOT use `AddParameter(name, "100")` — that overload sets a constant value and ignores configuration (the DWX version had this bug; `CapacityParameter_ReadsConfiguration` guards it).
 
 ### Cookie sensor
 
@@ -75,6 +86,20 @@ Reads `ConnectionStrings__messaging` from the environment (Aspire injects this).
 
 - Server: `WithReplicas(2)`, `WithHttpHealthCheck("/health")`, `WithExternalHttpEndpoints()`
 - PgAdmin and RabbitMQ management plugin included in run mode
+- `cookie-sensor` is declared after `server` on purpose: the Kamal publisher makes the first app the primary one that owns the accessories
+- `AspireUseCliBundle=false` + `NoWarn ASPIRE010`: orchestration (DCP, dashboard) comes from NuGet for reproducible tests
+
+## Tests
+
+```sh
+dotnet test src/CookieJar.Tests                                # model + E2E tests (needs Docker/Podman)
+dotnet run --project src/CookieJar.Tests -- -explicit only     # known SSE-per-replica bug (fails on purpose)
+```
+
+- `AppModelTests` — builds the app model only (no containers): replicas, `WaitFor`, health check, capacity parameter
+- `CookieJarAppFixture` — collection fixture that starts the AppHost once: removes PgAdmin, `frontend*` and `cookie-sensor*` resources (incl. the npm/pip installer resources Aspire 13.6 adds), removes the Postgres data volume, passes parameters as args (`Parameters:rabbitmq-password=e2e-test`, `Parameters:cookie-jar-capacity=42`), discovers per-replica URLs from `ASPNETCORE_URLS`
+- `CookieJarTests` — refill uses the capacity parameter; a `cookie-taken` message published to RabbitMQ is visible on both replicas; resets the level via SQL before each test
+- Stopping/starting RabbitMQ via `ResourceCommandService` inside a test hung the run (`WaitForResourceHealthyAsync` fails right after a restart) — avoid restart-based chaos tests here
 
 ## Running locally
 
@@ -124,8 +149,8 @@ Three publish targets wired in `AppHost.cs` via `PUBLISH_TARGET` env var:
 |---|---|---|
 | `docker-compose` | `AddDockerComposeEnvironment` | Stable; health checks patched by `2-fix.sh` |
 | `kubernetes` | `AddKubernetesEnvironment` | Preview; Helm chart, volume name dots + probes patched by `2-fix.sh` |
-| `kamal` | Custom `KamalPipelineStep` | Experimental, not an official Aspire provider |
+| `kamal` | `AddKamalEnvironment` ([Vensas.Aspire.Hosting.Kamal](https://github.com/vensas/aspire-hosting-kamal)) | Open-source NuGet package, not an official Aspire provider |
 
-**Kamal publisher** (`src/CookieJar.AppHost/Publishing/KamalPublisher.cs`): custom Aspire pipeline step (`Aspire.Hosting.Pipelines`, experimental) that walks the resource model and generates `config/deploy.yml` + `.kamal/secrets.example`. The `KamalDeploymentResource` carries `ServiceName`, `Architecture`, and `ExtraSecretEnvVars`.
+**Kamal** (`Vensas.Aspire.Hosting.Kamal` 0.1.1, requires Aspire ≥ 13.5.2): `AddKamalEnvironment("kamal")` with `WithServers`, `WithRegistry`, `WithProxyHostSuffix` (`<vm-ip>.nip.io`), `SshUser=ubuntu`, `BuilderArch=arm64`, `ImageNamespace=cookiejar`, proxy SSL disabled. Server IP and registry come from the `KAMAL_SERVER` / `KAMAL_REGISTRY` env vars set by `deploy/kamal/2-publish.sh`. `PublishAsKamalService` sets the proxy health check (`/health` for server, `/` for frontend). Output: `config/deploy.yml` (server + postgres/messaging accessories), `config/deploy.frontend.yml`, `config/deploy.cookie-sensor.yml`, `.kamal/secrets` (env references only), `Dockerfile.server`. `src/.dockerignore` keeps `node_modules`, `.venv`, `bin`, `obj` out of the `src` build context. The DWX custom `KamalPipelineStep` lives only at tag `dwx-2026`.
 
 Pre-generated artifacts and numbered shell scripts live in `deploy/` — see `deploy/README.md`.
