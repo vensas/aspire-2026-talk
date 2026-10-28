@@ -1,7 +1,9 @@
 using System.Net.Http.Json;
 using System.Text;
 using Aspire.Hosting;
+using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 
 namespace CookieJar.Tests;
@@ -47,6 +49,37 @@ public sealed class CookieJarTests(CookieJarAppFixture fixture) : IAsyncLifetime
             using var client = new HttpClient { BaseAddress = replica };
             Assert.Equal(93, await WaitForLevelAsync(client, 93));
         }
+    }
+
+    [Fact(Timeout = 120_000)]
+    public async Task BothReplicas_MigrateUnderTheLock()
+    {
+        // The console logs of each replica, through the same service that feeds the dashboard
+        var logs = fixture.App.Services.GetRequiredService<ResourceLoggerService>();
+
+        foreach (var replica in fixture.ReplicaResourceIds)
+            Assert.True(await WaitForLogLineAsync(logs, replica, "Released the migration lock"),
+                $"{replica} did not log the migration lock.");
+    }
+
+    private static async Task<bool> WaitForLogLineAsync(ResourceLoggerService logs, string resourceId, string text)
+    {
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken);
+        cts.CancelAfter(EventTimeout);
+        try
+        {
+            await foreach (var batch in logs.WatchAsync(resourceId).WithCancellation(cts.Token))
+            {
+                if (batch.Any(line => line.Content.Contains(text, StringComparison.Ordinal)))
+                    return true;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // The line did not arrive before the timeout
+        }
+
+        return false;
     }
 
     /// <summary>

@@ -20,6 +20,7 @@ public sealed class CookieJarAppFixture : IAsyncLifetime
 
     public DistributedApplication App { get; private set; } = null!;
     public IReadOnlyList<Uri> Replicas { get; private set; } = [];
+    public IReadOnlyList<string> ReplicaResourceIds { get; private set; } = [];
     public NpgsqlDataSource Database { get; private set; } = null!;
     public string MessagingConnectionString { get; private set; } = null!;
 
@@ -46,7 +47,7 @@ public sealed class CookieJarAppFixture : IAsyncLifetime
         await App.StartAsync(cts.Token);
         await App.ResourceNotifications.WaitForResourceHealthyAsync("server", cts.Token);
 
-        Replicas = await WaitForReplicasAsync(expected: 2, cts.Token);
+        (ReplicaResourceIds, Replicas) = await WaitForReplicasAsync(expected: 2, cts.Token);
         Database = NpgsqlDataSource.Create(await App.GetConnectionStringAsync("cookiejardb", cts.Token)
                                            ?? throw new InvalidOperationException("The connection string of cookiejardb is missing."));
         MessagingConnectionString = await App.GetConnectionStringAsync("messaging", cts.Token)
@@ -57,7 +58,7 @@ public sealed class CookieJarAppFixture : IAsyncLifetime
     /// The "http" endpoint of the server is the Aspire proxy, which sends each request to any replica.
     /// ASPNETCORE_URLS has the port of one replica.
     /// </summary>
-    private async Task<IReadOnlyList<Uri>> WaitForReplicasAsync(int expected, CancellationToken ct)
+    private async Task<(IReadOnlyList<string> ResourceIds, IReadOnlyList<Uri> Urls)> WaitForReplicasAsync(int expected, CancellationToken ct)
     {
         var urls = new Dictionary<string, Uri>();
         await foreach (var e in App.ResourceNotifications.WatchAsync(ct))
@@ -72,7 +73,10 @@ public sealed class CookieJarAppFixture : IAsyncLifetime
 
             urls[e.ResourceId] = new Uri(url);
             if (urls.Count == expected)
-                return [.. urls.OrderBy(u => u.Key).Select(u => u.Value)];
+            {
+                var ordered = urls.OrderBy(u => u.Key).ToList();
+                return ([.. ordered.Select(u => u.Key)], [.. ordered.Select(u => u.Value)]);
+            }
         }
 
         throw new OperationCanceledException();

@@ -53,7 +53,7 @@ cd src
 dotnet run --project CookieJar.AppHost
 ```
 
-Aspire will start all resources, run database migrations, and open the dashboard automatically.
+Aspire will start all resources, run database migrations, and open the dashboard automatically. The two server replicas migrate under a PostgreSQL advisory lock, so only one of them migrates at a time.
 
 ## Tests — Aspire.Hosting.Testing
 
@@ -68,6 +68,7 @@ dotnet test src/CookieJar.Tests
 | `AppModelTests.*` | App model only, no containers (< 1 s): server runs 2 replicas with a health check, waits for `cookiejardb` and `messaging`, the capacity parameter reads configuration |
 | `CookieJarTests.Refill_SetsLevelToCapacityParameter` | `POST /refill` returns the capacity passed in as `Parameters:cookie-jar-capacity=42` |
 | `CookieJarTests.CookieTakenEvent_LowersLevel_OnBothReplicas` | A `cookie-taken` message published to RabbitMQ lowers the level, and both server replicas see it |
+| `CookieJarTests.BothReplicas_MigrateUnderTheLock` | Both replicas migrate under a PostgreSQL advisory lock (`MigrateWithLockAsync`), checked through the replica console logs |
 | `CookieJarTests.LevelStream_OnEveryReplica_ReceivesEveryChange` | **Explicit, fails on purpose:** SSE subscriptions are in-memory per replica, so each replica only streams the events it consumed itself |
 
 The fixture removes PgAdmin, the frontend and the cookie sensor (incl. their npm/pip installer resources), drops the Postgres data volume, and passes parameters as arguments — no user secrets needed.

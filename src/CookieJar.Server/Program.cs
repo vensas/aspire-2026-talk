@@ -29,12 +29,8 @@ app.UseExceptionHandler();
 app.MapOpenApi();
 app.MapScalarApiReference();
 
-// Auto-migrate on startup
-await using (var scope = app.Services.CreateAsyncScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<CookieJarDbContext>();
-    await db.Database.MigrateAsync();
-}
+// Auto-migrate on startup — both replicas start at the same time, only one migrates at a time
+await app.MigrateWithLockAsync();
 
 var api = app.MapGroup("/api/cookiejar");
 

@@ -98,7 +98,7 @@ dotnet run --project src/CookieJar.Tests -- -explicit only     # known SSE-per-r
 
 - `AppModelTests` — builds the app model only (no containers): replicas, `WaitFor`, health check, capacity parameter
 - `CookieJarAppFixture` — collection fixture that starts the AppHost once: removes PgAdmin, `frontend*` and `cookie-sensor*` resources (incl. the npm/pip installer resources Aspire 13.6 adds), removes the Postgres data volume, passes parameters as args (`Parameters:rabbitmq-password=e2e-test`, `Parameters:cookie-jar-capacity=42`), discovers per-replica URLs from `ASPNETCORE_URLS`
-- `CookieJarTests` — refill uses the capacity parameter; a `cookie-taken` message published to RabbitMQ is visible on both replicas; resets the level via SQL before each test
+- `CookieJarTests` — refill uses the capacity parameter; a `cookie-taken` message published to RabbitMQ is visible on both replicas; both replicas log the migration lock (read through `ResourceLoggerService`); resets the level via SQL before each test
 - Stopping/starting RabbitMQ via `ResourceCommandService` inside a test hung the run (`WaitForResourceHealthyAsync` fails right after a restart) — avoid restart-based chaos tests here
 
 ## Running locally
@@ -134,6 +134,8 @@ dotnet ef migrations add <Name> --project src/CookieJar.Server
 ```
 
 Do NOT use dynamic values (e.g. `DateTime.UtcNow`) in `HasData` seed calls — use static hardcoded values.
+
+The server migrates at startup with `app.MigrateWithLockAsync()` (`Data/DatabaseMigrationExtensions.cs`): a PostgreSQL session advisory lock (`pg_advisory_lock`) around `MigrateAsync`, so the two replicas never migrate at the same time. It logs `Acquired the migration lock` / `Released the migration lock`; `BothReplicas_MigrateUnderTheLock` checks this. Keep the connection open between lock and unlock — the lock belongs to the session.
 
 ## Build
 
