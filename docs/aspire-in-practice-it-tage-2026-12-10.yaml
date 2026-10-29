@@ -465,7 +465,7 @@ slides:
     - - type: callout
         variant: trust
         title: Kamal
-        text: Deploys containers to plain servers over SSH. It needs no Kubernetes.
+        text: Deploys containers to plain servers over SSH. It needs no Kubernetes. <a href="https://kamal-deploy.org/" style="color:var(--text-trust);">kamal-deploy.org</a>
 - id: kamal-mapping
   layout: content
   blocks:
