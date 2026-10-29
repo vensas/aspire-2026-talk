@@ -471,20 +471,22 @@ slides:
   blocks:
   - type: heading
     label: Deployment
-    title: 'Kamal: from the app model to deploy.yml'
+    title: 'Inside the Kamal package: your own deployment target'
   - type: columns
     widths:
     - 5
     - 5
     columns:
-    - - type: table
-        rows:
-        - key: AddProject, AddPythonApp
-          value: One app with its own deploy.name.yml
-        - key: Containers
-          value: Accessories of the first app
-        - key: WithExternalHttpEndpoints
-          value: 'proxy: host, app_port, health check'
+    - - type: steps
+        steps:
+        - title: A compute environment
+          text: A resource that implements <code>IComputeEnvironmentResource</code>. <code>AddKamalEnvironment()</code> adds it only for publish.
+        - title: Pipeline steps
+          text: A <code>PipelineStepAnnotation</code> adds prepare, publish and deploy steps to <code>aspire publish</code> and <code>aspire deploy</code>.
+        - title: Map the app model
+          text: "<code>GetComputeResources()</code> gives each resource. A project becomes a Kamal app, a container an accessory."
+        - title: Resolve the values
+          text: The environment callbacks give the <code>WithReference</code> values. A secret becomes a reference, an endpoint a container name.
     - - type: code
         language: yaml
         filename: deploy/output/kamal/config/deploy.yml
@@ -493,9 +495,9 @@ slides:
           image: cookiejar/server
           proxy:
             host: server.192.168.64.5.nip.io
-            app_port: 8080
-            healthcheck:
-              path: /health
+          env:
+            secret:
+              - ConnectionStrings__cookiejardb
           accessories:
             postgres:
               image: docker.io/library/postgres:18.3
@@ -505,13 +507,13 @@ slides:
     - 5
     columns:
     - - type: callout
-        variant: info
-        title: Install
-        text: "<code>dotnet add package Vensas.Aspire.Hosting.Kamal</code>"
+        variant: warning
+        title: The pipeline API is experimental
+        text: "<code>ASPIREPIPELINES001</code>: expect changes between Aspire versions."
     - - type: callout
-        variant: info
-        title: Generated
-        text: "<code>aspire publish</code> writes this file."
+        variant: trust
+        title: Source and install
+        text: <code>dotnet add package Vensas.Aspire.Hosting.Kamal</code><br><a href="https://github.com/vensas/aspire-hosting-kamal" style="color:var(--text-trust);">github.com/vensas/aspire-hosting-kamal</a>
 - id: mcp
   layout: content
   blocks:
