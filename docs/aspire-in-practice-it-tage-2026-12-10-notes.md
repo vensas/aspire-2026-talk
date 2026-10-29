@@ -2,6 +2,8 @@
 
 Thursday 10 December 2026, 09:00–09:45, Frankfurt. The slides do not show the demo commands; they are here.
 
+Before slide 1: the IT-Tage title slide (`it-tage-2026-cover.pptx`) with the official session title. Show it while the room fills.
+
 | # | Slide | Notes |
 |---|---|---|
 | 1 | Cover | Practical experience, no marketing. Aspire 13.6 on .NET 10: local development, tests with Aspire.Hosting.Testing, deployment, MCP. |

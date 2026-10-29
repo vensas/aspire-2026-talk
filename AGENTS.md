@@ -21,6 +21,8 @@ All decks live in `docs/`, named `<title>-<event>-<date>` like in `../playwright
 
 ### IT-Tage deck (`docs/`)
 
+- The conference title slide comes first. Its source is `docs/it-tage-2026-cover.pptx` (the IT-Tage template, with the official German session title ".NET Aspire in der Praxis: Von lokaler Entwicklung bis zum Deployment"). Export it to `docs/it-tage-2026-cover.pdf` (PowerPoint → PDF, then scale to 960×540 pt with Ghostscript); `generate-docs.sh` puts it in front of the generated PDF with `pdfunite`. The slide numbers in the footers and in the speaker notes do not count it.
+
 Made with the vensas-doc-generator (`../vensas-doc-generator`), like `../playwright-2026-talk`, which is the reference for the look. Run `./generate-docs.sh` after each change to the YAML and look at the generated PDF pages.
 
 - Write the slides in ASD-STE100 (Simplified Technical English). One idea per sentence.

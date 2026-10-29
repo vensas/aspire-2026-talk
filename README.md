@@ -17,7 +17,7 @@ All decks are in `docs/`, the screenshots in `docs/img/`. The IT-Tage YAML is th
 ./generate-docs.sh
 ```
 
-The screenshots in `docs/img/` are real: the Aspire dashboard and the frontend from `aspire run`, and the failing explicit test from `dotnet run --project src/CookieJar.Tests -- -explicit only`.
+The PDF starts with the IT-Tage title slide from `docs/it-tage-2026-cover.pptx` (exported to `docs/it-tage-2026-cover.pdf`; `generate-docs.sh` adds it with `pdfunite` from poppler). The screenshots in `docs/img/` are real: the Aspire dashboard and the frontend from `aspire run`, and the failing explicit test from `dotnet run --project src/CookieJar.Tests -- -explicit only`.
 
 ## Repository structure
 

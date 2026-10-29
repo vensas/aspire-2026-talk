@@ -88,6 +88,17 @@ for name in "${TARGETS[@]}"; do
     continue
   fi
 
+  # The conference title slide goes first. It is made from the IT-Tage
+  # PowerPoint template (it-tage-2026-cover.pptx) and exported to PDF.
+  cover="$DOCS_DIR/it-tage-2026-cover.pdf"
+  if [ -f "$cover" ]; then
+    if command -v pdfunite >/dev/null 2>&1; then
+      pdfunite "$cover" "$pdf" "$pdf.tmp" && mv "$pdf.tmp" "$pdf"
+    else
+      echo "(no pdfunite: the conference title slide is missing) " | tr -d '\n'
+    fi
+  fi
+
   size="$(du -k "$pdf" | cut -f1)"
   # pdfinfo comes with poppler. Report the page count only if it is installed,
   # because a wrong count is worse than no count.
