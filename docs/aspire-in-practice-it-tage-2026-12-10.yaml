@@ -359,7 +359,7 @@ slides:
         text: The same test passes. The bug stays hidden.
 - id: compose
   layout: content
-  title: Docker Compose
+  title: 'Deployment: Docker Compose'
   blocks:
   - type: columns
     widths:
@@ -406,7 +406,7 @@ slides:
         text: The secrets come from <code>.env</code>.
 - id: kubernetes-kamal
   layout: content
-  title: Kubernetes and Kamal
+  title: 'Deployment: Kubernetes and Kamal'
   blocks:
   - type: columns
     widths:
