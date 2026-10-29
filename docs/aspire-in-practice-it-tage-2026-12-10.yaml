@@ -480,13 +480,13 @@ slides:
     - - type: steps
         steps:
         - title: A compute environment
-          text: A resource that implements <code>IComputeEnvironmentResource</code>. <code>AddKamalEnvironment()</code> adds it only for publish.
+          text: "<code>IComputeEnvironmentResource</code>"
         - title: Pipeline steps
-          text: A <code>PipelineStepAnnotation</code> adds prepare, publish and deploy steps to <code>aspire publish</code> and <code>aspire deploy</code>.
+          text: "<code>PipelineStepAnnotation</code>: prepare, publish, deploy"
         - title: Map the app model
-          text: "<code>GetComputeResources()</code> gives each resource. A project becomes a Kamal app, a container an accessory."
+          text: Project → app. Container → accessory.
         - title: Resolve the values
-          text: The environment callbacks give the <code>WithReference</code> values. A secret becomes a reference, an endpoint a container name.
+          text: Secret → reference. Endpoint → container name.
     - - type: code
         language: yaml
         filename: deploy/output/kamal/config/deploy.yml
@@ -508,12 +508,12 @@ slides:
     columns:
     - - type: callout
         variant: warning
-        title: The pipeline API is experimental
-        text: "<code>ASPIREPIPELINES001</code>: expect changes between Aspire versions."
+        title: Experimental API
+        text: "<code>ASPIREPIPELINES001</code>"
     - - type: callout
         variant: trust
-        title: Source and install
-        text: <code>dotnet add package Vensas.Aspire.Hosting.Kamal</code><br><a href="https://github.com/vensas/aspire-hosting-kamal" style="color:var(--text-trust);">github.com/vensas/aspire-hosting-kamal</a>
+        title: Install
+        text: "<code>dotnet add package Vensas.Aspire.Hosting.Kamal</code>"
 - id: mcp
   layout: content
   blocks:
