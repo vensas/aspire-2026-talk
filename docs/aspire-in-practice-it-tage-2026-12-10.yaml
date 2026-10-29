@@ -1,0 +1,576 @@
+---
+number: SL-20261210-01
+date: '2026-12-10'
+output_file: aspire-in-practice-it-tage-2026-12-10
+lang: en
+title: Aspire in Practice
+theme: dark
+type: slides
+slides:
+- id: cover
+  layout: cover
+  hero:
+    headline: 'Aspire '
+    headline_highlight: in Practice
+    label: IT-Tage 2026 · Frankfurt · 10 December 2026
+    subtext: From local development to tests and deployment. Sven Hennessen · vensas GmbH
+- blocks:
+  - columns:
+    - - alt: Sven Hennessen
+        src: avatar.jpg
+        type: image
+      - text: <strong style="color:var(--text-primary);font-size:19px;">Sven Hennessen</strong><br><span style="color:var(--text-accent);">vensas GmbH</span>
+        type: text
+    - - text: <div style="flex:1;height:100%;box-sizing:border-box;margin:0;padding:20px 24px;background:rgba(106,190,167,0.10);border:1px solid rgba(106,190,167,0.35);border-radius:10px;display:flex;flex-direction:column;justify-content:center;gap:16px;"> <div style="display:flex;gap:12px;align-items:flex-start;"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-trust);flex-shrink:0;margin-top:9px;"></span><span style="font-size:17px;line-height:1.6;"><strong style="color:var(--text-accent);">Almost 20 years</strong> of software development and architecture</span></div> <div style="display:flex;gap:12px;align-items:flex-start;"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-trust);flex-shrink:0;margin-top:9px;"></span><span style="font-size:17px;line-height:1.6;"><strong style="color:var(--text-accent);">Co-founder and co-managing director</strong> of vensas GmbH, founded in 2023</span></div> <div style="display:flex;gap:12px;align-items:flex-start;"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-trust);flex-shrink:0;margin-top:9px;"></span><span style="font-size:17px;line-height:1.6;">Consulting and development of <strong style="color:var(--text-accent);">business software</strong> for medium-sized companies</span></div> <div style="display:flex;gap:12px;align-items:flex-start;"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-trust);flex-shrink:0;margin-top:9px;"></span><span style="font-size:17px;line-height:1.6;">Away from the computer — <strong style="color:var(--text-accent);">hiking</strong>, <strong style="color:var(--text-accent);">cycling</strong> and <strong style="color:var(--text-accent);">snowboarding</strong></span></div> </div>
+        type: text
+    type: columns
+    widths:
+    - 2
+    - 8.8
+  - type: text
+    text: "<style>.code-block pre{font-size:17px !important;line-height:1.5 !important}</style>"
+  id: about-me
+  layout: content
+  title: About me
+- id: history
+  layout: content
+  title: From Tye to Aspire
+  blocks:
+  - type: flow
+    phases:
+    - label: '2019'
+      color: muted
+      title: Project Tye
+      text: A Microsoft experiment. A CLI that starts all services.
+    - label: '2023'
+      color: muted
+      title: ".NET Aspire preview"
+      text: Build 2023. A tool for the local developer.
+    - label: '2024'
+      color: muted
+      title: Aspire GA
+      text: May 2024, on .NET 8. A stable API.
+    - label: '2025'
+      color: accent
+      title: Aspire on its own
+      text: Not tied to .NET releases. Its own version numbers.
+  - type: text
+    text: This talk uses Aspire 13.6 on .NET 10.
+- id: demo-app
+  layout: content
+  blocks:
+  - type: heading
+    label: Local development
+    title: 'The demo app: the cookie jar'
+  - type: columns
+    widths:
+    - 6
+    - 4
+    columns:
+    - - type: text
+        text: A sensor takes cookies from the office cookie jar. The page shows the fill level in real time.
+      - type: table
+        rows:
+        - key: Sensor
+          value: Python, sends cookie-taken events
+        - key: Broker
+          value: RabbitMQ
+        - key: Server
+          value: ASP.NET Core and EF Core, two replicas
+        - key: Database
+          value: PostgreSQL
+        - key: Frontend
+          value: React and Vite, Server-Sent Events
+    - - type: image
+        src: img/keksdose-frontend.png
+        alt: The cookie jar page. The level is 89, with a button to refill the jar.
+- id: apphost
+  layout: content
+  blocks:
+  - type: heading
+    label: Local development
+    title: One AppHost for three languages
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: code
+        language: csharp
+        filename: AppHost.cs
+        code: |
+          var server = builder
+            .AddProject<Projects.CookieJar_Server>("server")
+            .WithReference(db).WaitFor(db)
+            .WithReference(rabbitmq).WaitFor(rabbitmq)
+            .WithReplicas(2);
+
+          builder.AddPythonApp("cookie-sensor", ...)
+            .WithReference(rabbitmq);
+
+          builder.AddViteApp("frontend", "../frontend")
+            .WithReference(server);
+      - type: callout
+        variant: info
+        text: "<code>aspire run</code> starts all of it. <code>WaitFor</code> holds the start until the resource is healthy."
+    - - type: image
+        src: img/dashboard-graph.png
+        alt: The resource graph in the Aspire dashboard. Two server replicas, postgres, messaging, cookie-sensor and frontend. All are healthy.
+- id: dashboard
+  layout: content
+  blocks:
+  - type: heading
+    label: Local development
+    title: Logs, traces and metrics in one dashboard
+  - type: columns
+    widths:
+    - 4
+    - 6
+    columns:
+    - - type: list
+        title: What you get
+        items:
+        - OpenTelemetry from AddServiceDefaults()
+        - Console and structured logs for each replica
+        - Traces across the services
+        - Start, stop and restart for each resource
+      - type: text
+        text: The two replicas take turns. RabbitMQ gives each event to one of them.
+    - - type: image
+        src: img/dashboard-traces.png
+        alt: The traces page. The cookie-taken events go to server-juwhhcaw and server-nsfcsabm in turns.
+- id: parameters
+  layout: content
+  blocks:
+  - type: heading
+    label: Local development
+    title: Parameters and secrets
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: code
+        language: csharp
+        filename: AppHost.cs
+        code: |
+          // A secret has no default value
+          var password = builder.AddParameter(
+              "rabbitmq-password", secret: true);
+
+          // Read the configuration, then the default
+          var capacity = builder.AddParameter(
+              "cookie-jar-capacity",
+              config["Parameters:cookie-jar-capacity"]
+                  ?? "100");
+    - - type: image
+        src: img/dashboard-parameters.png
+        alt: The parameters tab in the dashboard. cookie-jar-capacity is 100, rabbitmq-password is hidden.
+      - type: callout
+        variant: warning
+        title: Watch out
+        text: AddParameter(name, "100") sets a constant value. Aspire then ignores the configuration. Read the configuration first, as above.
+- id: internals
+  layout: content
+  blocks:
+  - type: heading
+    label: Local development
+    title: How Aspire works
+  - type: text
+    text: <div class="card" style="width:100%;box-sizing:border-box;padding:16px 24px;border-left:4px solid var(--color-trust);"><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;"><h3 style="font-size:17px;font-weight:700;color:var(--text-trust);margin:0;">Runtime architecture</h3><span style="font-size:14px;color:var(--text-secondary);">The AppHost translates the model. DCP orchestrates the resources.</span></div><div style="display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;"><div style="background:var(--slide-bg-card);border:1px solid var(--color-trust);border-radius:8px;padding:10px 20px;font-size:19px;font-weight:600;line-height:1.4;color:var(--text-trust);white-space:nowrap;text-align:center;">AppHost<br><span style="font-weight:400;font-size:15px;color:var(--text-secondary);">.NET</span></div><div style="display:flex;flex-direction:column;align-items:center;padding:0 14px;gap:2px;"><span style="font-size:20px;line-height:1;color:var(--text-secondary);">⇄</span><span style="font-size:14px;color:var(--text-secondary);white-space:nowrap;">KubernetesClient</span></div><div style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:8px;padding:10px 20px;font-size:19px;font-weight:600;line-height:1.4;color:var(--text-primary);white-space:nowrap;text-align:center;">DCP<br><span style="font-weight:400;font-size:15px;color:var(--text-secondary);">Go binary</span></div><div style="display:flex;flex-direction:column;align-items:center;padding:0 14px;gap:2px;"><span style="font-size:20px;line-height:1;color:var(--text-secondary);">→</span><span style="font-size:14px;color:var(--text-secondary);white-space:nowrap;">starts and monitors</span></div><div style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:8px;padding:10px 20px;font-size:19px;font-weight:600;line-height:1.4;color:var(--text-primary);white-space:nowrap;text-align:center;">Resources<br><span style="font-weight:400;font-size:15px;color:var(--text-secondary);">containers and processes</span></div><div style="display:flex;flex-direction:column;align-items:center;padding:0 14px;gap:2px;"><span style="font-size:20px;line-height:1;color:var(--text-secondary);">→</span><span style="font-size:14px;color:var(--text-secondary);white-space:nowrap;">OTLP</span></div><div style="background:var(--slide-bg-card);border:1px solid var(--color-trust);border-radius:8px;padding:10px 20px;font-size:19px;font-weight:600;line-height:1.4;color:var(--text-trust);white-space:nowrap;text-align:center;">Dashboard<br><span style="font-weight:400;font-size:15px;color:var(--text-secondary);">separate process</span></div></div></div>
+  - type: card-grid
+    columns: 2
+    cards:
+    - variant: quality
+      title: Annotation model
+      text: Each resource is an <code style="color:var(--text-primary);">IResource</code> with annotations. <code style="color:var(--text-primary);">Build()</code> makes the model real.
+    - variant: quality
+      title: WithReference
+      text: Gives connection strings and service URLs as environment variables. No ports in the code.
+- id: testing
+  layout: content
+  blocks:
+  - type: heading
+    label: Testing
+    title: Test the real app
+  - type: text
+    text: Aspire.Hosting.Testing starts your AppHost in the test. The test gets the same services and containers as <code>aspire run</code>.
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: text
+        text: <strong style="color:var(--text-accent);">1</strong> <strong style="color:var(--text-primary);">Check the model. No containers start.</strong>
+      - type: code
+        language: csharp
+        filename: AppModelTests.cs
+        code: |
+          var builder = await
+            DistributedApplicationTestingBuilder
+              .CreateAsync<Projects.CookieJar_AppHost>();
+
+          var server = builder.Resources
+              .Single(r => r.Name == "server");
+          Assert.Equal(2, server.GetReplicaCount());
+    - - type: text
+        text: <strong style="color:var(--text-accent);">2</strong> <strong style="color:var(--text-primary);">Start the app and send a request.</strong>
+      - type: code
+        language: csharp
+        filename: CookieJarAppFixture.cs
+        code: |
+          App = await builder.BuildAsync(ct);
+          await App.StartAsync(ct);
+          await App.ResourceNotifications
+              .WaitForResourceHealthyAsync("server", ct);
+
+          var http = App.CreateHttpClient("server");
+  - type: callout
+    variant: info
+    title: Recommendation
+    text: Run step 1 in each PR build. It takes less than 1 s. Step 2 starts the containers one time for all tests.
+- id: test-apphost
+  layout: content
+  blocks:
+  - type: heading
+    label: Testing
+    title: Prepare the AppHost for the test
+  - type: text
+    text: Before <code>BuildAsync()</code>, the test can change the app model. Three changes make the test reliable.
+  - type: code
+    language: csharp
+    filename: CookieJarAppFixture.cs
+    code: |
+      // 1. Give the parameters as arguments. No user secrets are necessary.
+      var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.CookieJar_AppHost>(
+          ["Parameters:rabbitmq-password=e2e-test", "Parameters:cookie-jar-capacity=42"]);
+
+      // 2. Remove the UI and the random sensor. The test sends the events.
+      foreach (var r in builder.Resources.Where(r => r is PgAdminContainerResource
+                   || r.Name.StartsWith("frontend") || r.Name.StartsWith("cookie-sensor")).ToList())
+          builder.Resources.Remove(r);
+
+      // 3. Remove the data volume. Each run starts with an empty database.
+      foreach (var mount in postgres.Annotations.OfType<ContainerMountAnnotation>().ToList())
+          postgres.Annotations.Remove(mount);
+  - type: callout
+    variant: info
+    text: The changes apply only to the test. <code>aspire run</code> does not change.
+- id: replicas-in-tests
+  layout: content
+  blocks:
+  - type: heading
+    label: Testing
+    title: Two replicas show a bug
+  - type: text
+    text: The test starts 2 server replicas, as in production. It sends 4 events. Each replica must stream all 4 to its browsers.
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: code
+        language: csharp
+        filename: CookieJarTests.cs
+        code: |
+          // Start: 100. Each event takes 1 cookie.
+          var streams = fixture.Replicas
+              .Select(ReadLevelStreamAsync).ToList();
+
+          for (var i = 0; i < 4; i++)
+              await PublishCookieTakenAsync(amount: 1);
+
+          foreach (var stream in streams)
+              Assert.Equal([100, 99, 98, 97, 96],
+                  await stream);
+    - - type: image
+        src: img/test-sse-failure.png
+        alt: Test output. LevelStream_OnEveryReplica_ReceivesEveryChange fails. Expected 100, 99, 98, 97, 96. Actual 100, 99, 98.
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: callout
+        variant: warning
+        title: The bug
+        text: The database is correct. But only the replica that got the event tells its browsers.
+    - - type: callout
+        variant: accent
+        title: With 1 instance
+        text: The same test passes. Thus the bug stays hidden until production.
+- id: project-a
+  layout: content
+  blocks:
+  - type: heading
+    label: Testing · From a real project
+    title: A delivery service with two replicas
+  - type: columns
+    widths:
+    - 6
+    - 4
+    columns:
+    - - type: code
+        language: csharp
+        filename: E2ETestHost.cs
+        code: |
+          // Each test run gets its own containers
+          foreach (var r in appHost.Resources
+                       .OfType<ContainerResource>())
+              r.Annotations.Add(new ContainerLifetimeAnnotation
+                  { Lifetime = ContainerLifetime.Session });
+
+          // The upstream system is a fake in the test process
+          appHost.CreateResourceBuilder<ProjectResource>("api")
+              .WithEnvironment("UPSTREAM_URL", fakeUpstream.Url);
+
+          // Chaos: freeze the storage, then check the behavior
+          await DockerAsync("pause", storageContainerId);
+    - - type: box
+        title: What the tests check
+        items:
+        - label: Lock
+          text: Only one replica migrates. The cron job runs one time per tick.
+        - label: Outage
+          text: The cache answers. Else 503 with Retry-After.
+        - label: Runtime
+          text: Nightly, about 8 minutes.
+  - type: callout
+    variant: info
+    title: Recommendation
+    text: Run the E2E tests nightly. An environment variable turns the project on, thus the PR build skips it.
+- id: project-b
+  layout: content
+  blocks:
+  - type: heading
+    label: Testing · From a real project
+    title: A business application with a web UI
+  - type: columns
+    widths:
+    - 6
+    - 4
+    columns:
+    - - type: code
+        language: csharp
+        filename: AspireAppFixture.cs
+        code: |
+          appHost.CreateResourceBuilder<ProjectResource>("api")
+              // The real external system is not reachable
+              .WithEnvironment("EXTERNAL__MASTERDATA__BASEADDRESS",
+                  "http://127.0.0.1:9")
+              // Healthy = the API runs and asks for a login
+              .WithHttpHealthCheck("/v1/me", statusCode: 401);
+
+          await TestData.SeedAsync(NpgsqlDataSource.Create(
+              await app.GetConnectionStringAsync("app-db")));
+    - - type: list
+        title: How the team works
+        items:
+        - One test for each acceptance criterion
+        - UI, API and database in one run
+        - Playwright keeps the trace only after a failure
+  - type: callout
+    variant: info
+    title: Recommendation
+    text: Make each external system unreachable in the test. Then no test can call it by mistake.
+- id: compose
+  layout: content
+  blocks:
+  - type: heading
+    label: Deployment
+    title: Docker Compose
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: code
+        language: csharp
+        filename: AppHost.cs
+        code: |
+          builder.AddDockerComposeEnvironment(
+                  "docker-compose")
+              .ConfigureComposeFile(c =>
+                  c.Services["server"]
+                      .DependsOn["postgres"]
+                      .Condition = "service_healthy");
+
+          // aspire publish --output-path ./deploy/output
+    - - type: code
+        language: yaml
+        filename: deploy/output/docker-compose/docker-compose.yaml
+        code: |
+          server:
+            image: "${SERVER_IMAGE}"
+            environment:
+              CookieJar__Capacity: "${COOKIE_JAR_CAPACITY}"
+              MESSAGING_PASSWORD: "${RABBITMQ_PASSWORD}"
+            depends_on:
+              postgres:
+                condition: "service_healthy"
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: callout
+        variant: trust
+        title: Azure is a first-class target too
+        text: "<code>azd up</code> reads the same model. It is not part of this demo."
+    - - type: callout
+        variant: trust
+        title: Generated by aspire publish
+        text: The secrets come from <code>.env</code>.
+- id: kubernetes-kamal
+  layout: content
+  blocks:
+  - type: heading
+    label: Deployment
+    title: Kubernetes and Kamal
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: code
+        language: csharp
+        filename: AppHost.cs
+        code: |
+          builder.AddKubernetesEnvironment("kubernetes");
+
+          // aspire publish → deploy/output/helm
+          // helm upgrade --install cookiejar \
+          //     ./deploy/output/helm
+    - - type: code
+        language: csharp
+        filename: AppHost.cs
+        code: |
+          builder.AddKamalEnvironment("kamal")
+              .WithServers(vmIp)
+              .WithRegistry(registry, username)
+              .WithProxyHostSuffix($"{vmIp}.nip.io");
+
+          server.PublishAsKamalService((_, config) =>
+              config.Proxy!.Healthcheck =
+                  new() { Path = "/health" });
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: callout
+        variant: warning
+        title: Kubernetes is a preview
+        text: The Helm chart is a start, not the final chart. Plan time to complete it.
+    - - type: callout
+        variant: trust
+        title: Kamal
+        text: Deploys containers to plain servers over SSH. It needs no Kubernetes. <a href="https://kamal-deploy.org/" style="color:var(--text-trust);">kamal-deploy.org</a>
+- id: kamal-mapping
+  layout: content
+  blocks:
+  - type: heading
+    label: Deployment
+    title: 'Inside the Kamal package: your own deployment target'
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: steps
+        steps:
+        - title: A compute environment
+          text: "<code>IComputeEnvironmentResource</code>"
+        - title: Pipeline steps
+          text: "<code>PipelineStepAnnotation</code>: prepare, publish, deploy"
+        - title: Map the app model
+          text: Project → app. Container → accessory.
+        - title: Resolve the values
+          text: Secret → reference. Endpoint → container name.
+    - - type: code
+        language: yaml
+        filename: deploy/output/kamal/config/deploy.yml
+        code: |
+          service: server
+          image: cookiejar/server
+          proxy:
+            host: server.192.168.64.5.nip.io
+          env:
+            secret:
+              - ConnectionStrings__cookiejardb
+          accessories:
+            postgres:
+              image: docker.io/library/postgres:18.3
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: callout
+        variant: warning
+        title: Experimental API
+        text: "<code>ASPIREPIPELINES001</code>"
+    - - type: callout
+        variant: trust
+        title: Install
+        text: "<code>dotnet add package Vensas.Aspire.Hosting.Kamal</code>"
+- id: mcp
+  layout: content
+  blocks:
+  - type: heading
+    label: AI
+    title: 'Aspire MCP: the agent sees the running app'
+  - type: text
+    text: The MCP server gives the agent the resources, logs and traces of the running app. Not only the code.
+  - type: code
+    language: bash
+    code: 'aspire agent init    # writes the MCP configuration for Claude Code, Copilot and others
+
+      '
+  - type: flow
+    phases:
+    - label: Step 1
+      color: trust
+      title: Prompt
+      text: Why does replica 2 not stream the new level?
+    - label: Step 2
+      color: trust
+      title: Resources
+      text: list_resources gives the state of each replica.
+    - label: Step 3
+      color: trust
+      title: Logs
+      text: list_structured_logs shows which replica consumed the event.
+    - label: Step 4
+      color: accent
+      title: Answer
+      text: The cause, with log lines. You decide on the fix.
+- id: lessons
+  layout: content
+  title: TL;DR
+  blocks:
+  - type: steps
+    steps:
+    - title: Use Aspire for local development now.
+      text: The full stack with one command, in any language, with OpenTelemetry.
+    - title: Test with the real AppHost and two replicas.
+      text: Aspire.Hosting.Testing shows the problems that one instance hides.
+    - title: Outside Azure, plan time for the deployment.
+      text: Compose and Helm are a start. Kamal shows that the provider model works.
+    - title: 'AI: give the agent the running app with Aspire MCP.'
+      text: Resources, logs and traces are the context. A human decides on the fix.
+- blocks:
+  - columns:
+    - - text: <div class="card" style="background:var(--slide-bg-card);border:2px solid var(--highlight);"><div class="label" style="margin-bottom:12px;">Thank you</div><h3 style="margin-bottom:12px;">Questions?</h3><p style="font-size:15px;">Demo project and slides available at <a href="https://github.com/vensas/aspire-2026-talk" style="color:inherit;text-decoration:underline;">https://github.com/vensas/aspire-2026-talk</a></p><div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;"><a href="https://www.linkedin.com/in/svenhennessen/" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text-accent);"><span style="display:flex;align-items:center;"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" style="flex:0 0 auto;"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></span><span style="font-size:15px;font-weight:600;">https://www.linkedin.com/in/svenhennessen/</span></a><a href="mailto:kontakt@vensas.de" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text-accent);"><span style="display:flex;align-items:center;"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" style="flex:0 0 auto;"><path d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6zm2 .5V18h16V6.5l-8 5-8-5zM4.6 6 12 10.6 19.4 6H4.6z"/></svg></span><span style="font-size:15px;font-weight:600;">kontakt@vensas.de</span></a><a href="https://vensas.de" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text-trust);"><span style="display:flex;align-items:center;"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" style="flex:0 0 auto;"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.93 6h-2.95a15.6 15.6 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.93 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14A7.96 7.96 0 0 1 4 12c0-.69.1-1.36.26-2h3.38a16.6 16.6 0 0 0 0 4H4.26zm.81 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.99 7.99 0 0 1 5.07 16zm2.95-8H5.07a7.99 7.99 0 0 1 4.33-3.56A15.6 15.6 0 0 0 8.02 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66a14.9 14.9 0 0 1 0-4h4.68a14.9 14.9 0 0 1 0 4zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a7.99 7.99 0 0 1-4.33 3.56zM16.36 14a16.6 16.6 0 0 0 0-4h3.38a8 8 0 0 1 0 4h-3.38z"/></svg></span><span style="font-size:15px;font-weight:600;">vensas.de</span></a><a href="https://github.com/vensas/aspire-hosting-kamal" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text-trust);"><span style="display:flex;align-items:center;"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" style="flex:0 0 auto;"><path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.56-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg></span><span style="font-size:15px;font-weight:600;">github.com/vensas/aspire-hosting-kamal</span></a></div></div>
+        type: text
+    - - alt: QR code for the repository
+        caption: Slides & Demo
+        src: repo-qr.png
+        type: image
+    type: columns
+    widths:
+    - 8
+    - 1.6
+  id: questions
+  layout: content
+  title: That's all folks!

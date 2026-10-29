@@ -1,4 +1,4 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.4.6">
+<Project Sdk="Aspire.AppHost.Sdk/13.6.4">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,6 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>ba891fac-9f2e-4112-b3da-db1f2e79cca8</UserSecretsId>
+    <!-- Orchestration (DCP, dashboard) from NuGet, not the installed Aspire CLI — reproducible in tests and CI -->
+    <AspireUseCliBundle>false</AspireUseCliBundle>
+    <NoWarn>$(NoWarn);ASPIRE010</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,11 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.Docker" Version="13.4.6" />
-    <PackageReference Include="Aspire.Hosting.JavaScript" Version="13.4.6" />
-    <PackageReference Include="Aspire.Hosting.Kubernetes" Version="13.4.6-preview.1.26319.6" />
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.4.6" />
-    <PackageReference Include="Aspire.Hosting.Python" Version="13.4.6" />
-    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.4.6" />
+    <PackageReference Include="Aspire.Hosting.Docker" Version="13.6.4" />
+    <PackageReference Include="Aspire.Hosting.JavaScript" Version="13.6.4" />
+    <PackageReference Include="Aspire.Hosting.Kubernetes" Version="13.6.4-preview.1.26523.11" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.6.4" />
+    <PackageReference Include="Aspire.Hosting.Python" Version="13.6.4" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.6.4" />
+    <PackageReference Include="Vensas.Aspire.Hosting.Kamal" Version="0.1.1" />
   </ItemGroup>
 </Project>

@@ -2,20 +2,18 @@
 # Removes the Kamal deployment from the server and optionally destroys the Multipass VM.
 # Run from the repository root.
 set -euo pipefail
+source "$(dirname "$0")/_common.sh"
 
-ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-OUTPUT="$ROOT/deploy/output/kamal"
-VM_NAME="${VM_NAME:-kamal-demo}"
-
-KAMAL="$(command -v kamal 2>/dev/null || echo /opt/homebrew/lib/ruby/gems/4.0.0/bin/kamal)"
-
-if [[ -f "$OUTPUT/config/deploy.yml" && -f "$OUTPUT/.kamal/secrets" ]]; then
-  echo "Removing Kamal deployment from server..."
+if [[ -f "$OUTPUT/config/deploy.yml" && -n "$VM_IP" ]]; then
   cd "$OUTPUT"
-  "$KAMAL" remove --confirmed 2>/dev/null || echo "  (nothing deployed — skipping)"
+  # Secondary apps first — the primary config also removes proxy and accessories
+  for (( i=${#APPS[@]}-1; i>=0; i-- )); do
+    echo "Removing ${APPS[$i]}..."
+    "$KAMAL" remove --confirmed -c "$(config_for "${APPS[$i]}")" 2>/dev/null || echo "  (not deployed — skipping)"
+  done
   cd "$ROOT"
 else
-  echo "No Kamal output or secrets found — skipping remote teardown."
+  echo "No Kamal output or VM found — skipping remote teardown."
 fi
 
 echo ""

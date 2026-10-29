@@ -95,43 +95,42 @@ The Aspire Kubernetes provider is a **Preview** feature. The generated Helm char
 
 ---
 
-## 3. Kamal (Custom Pipeline Step)
+## 3. Kamal (Vensas.Aspire.Hosting.Kamal)
 
-Kamal deploys Docker containers directly to VMs via SSH — no Kubernetes required.
+Kamal deploys Docker containers directly to VMs via SSH — no Kubernetes required. The AppHost uses the open-source [Vensas.Aspire.Hosting.Kamal](https://github.com/vensas/aspire-hosting-kamal) package (`AddKamalEnvironment`), which generates one Kamal config per app:
 
-```bash
-./deploy/kamal/2-publish.sh      # aspire publish via custom KamalPipelineStep
-# fill in deploy/output/kamal/.kamal/secrets
-./deploy/kamal/3-build-push.sh   # build + push all images
-./deploy/kamal/4-setup.sh        # first time: install Docker, boot proxy + accessories
-./deploy/kamal/5-deploy.sh       # deploy (subsequent runs skip 4-setup.sh)
-```
-
-The Kamal integration is **experimental** — `KamalDeploymentResource` is a custom `PipelineStep` that walks the Aspire resource model and generates `config/deploy.yml` + `.kamal/secrets.example`. It is not an official Aspire provider.
-
-After a successful deploy:
-
-| Service | URL |
+| File | Content |
 |---|---|
-| API | `http://<SERVER_IP>` |
-| Frontend | `http://<SERVER_IP>:3000` |
-| Health | `http://<SERVER_IP>/health` |
+| `config/deploy.yml` | `server` (primary app) + `postgres` and `messaging` accessories |
+| `config/deploy.frontend.yml` | nginx frontend, proxies `/api/` to `http://server-web:8080` |
+| `config/deploy.cookie-sensor.yml` | Python sensor, no proxy |
+| `.kamal/secrets` | Only references to env vars (`$POSTGRES_PASSWORD`, `$RABBITMQ_PASSWORD`, `$KAMAL_REGISTRY_PASSWORD`) |
+| `Dockerfile.server` | Generated multi-stage .NET build (context: `src/`) |
 
 ### Testing locally with Multipass
 
 ```bash
 ./deploy/kamal/1-setup-vm.sh     # launch VM, start local registry, install SSH key
-
-./deploy/kamal/2-publish.sh
-# edit deploy/output/kamal/.kamal/secrets (IPs are printed by 1-setup-vm.sh)
-
-./deploy/kamal/3-build-push.sh
-./deploy/kamal/4-setup.sh        # ~2 min first time
-./deploy/kamal/5-deploy.sh
+./deploy/kamal/2-publish.sh      # aspire publish with the VM IP and registry baked into the configs
+./deploy/kamal/3-build-push.sh   # build the generated Dockerfiles with Podman + push
+./deploy/kamal/4-setup.sh        # first time: install Docker, boot proxy + accessories (~2 min)
+./deploy/kamal/5-deploy.sh       # kamal deploy --skip-push for each app config
 ```
+
+`_common.sh` holds the shared settings and demo secret defaults (`POSTGRES_PASSWORD`, `RABBITMQ_PASSWORD`, `KAMAL_REGISTRY_PASSWORD` — override them via the environment) and adds `~/.ssh/kamal-multipass` to the ssh-agent.
+
+Kamal can build images itself, but needs `docker buildx`. This setup uses Podman, so `3-build-push.sh` builds the images from the generated configs, and `5-deploy.sh` deploys with `--skip-push --version <git sha>`. With Docker, `aspire deploy` can run `kamal deploy` directly.
+
+After a successful deploy (hostnames via [nip.io](https://nip.io), SSL disabled for the local VM):
+
+| Service | URL |
+|---|---|
+| Frontend | `http://frontend.<VM_IP>.nip.io` |
+| API | `http://server.<VM_IP>.nip.io/scalar` |
+| Health | `http://server.<VM_IP>.nip.io/health` |
 
 **Teardown:**
 
 ```bash
-./deploy/kamal/6-teardown.sh     # undeploy, optionally destroy VM and local registry
+./deploy/kamal/6-teardown.sh     # kamal remove per app, optionally destroy VM and local registry
 ```
