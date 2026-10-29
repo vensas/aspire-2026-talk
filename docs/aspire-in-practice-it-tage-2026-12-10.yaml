@@ -527,24 +527,22 @@ slides:
     code: 'aspire agent init    # writes the MCP configuration for Claude Code, Copilot and others
 
       '
-  - type: flow
-    phases:
-    - label: Step 1
-      color: trust
-      title: Prompt
-      text: Why does replica 2 not stream the new level?
-    - label: Step 2
-      color: trust
-      title: Resources
-      text: list_resources gives the state of each replica.
-    - label: Step 3
-      color: trust
-      title: Logs
-      text: list_structured_logs shows which replica consumed the event.
-    - label: Step 4
-      color: accent
-      title: Answer
-      text: The cause, with log lines. You decide on the fix.
+  - type: columns
+    widths:
+    - 4
+    - 6
+    columns:
+    - - type: steps
+        steps:
+        - title: Prompt
+          text: Why does replica 2 not stream the new level?
+        - title: Logs
+          text: The agent reads the structured logs of both replicas through MCP.
+        - title: Answer
+          text: The cause, with the log lines. You decide on the fix.
+    - - type: image
+        src: img/mcp-agent-answer.png
+        alt: Agent session. The agent calls list_structured_logs two times. The page streams from server-xyzjuknq, RabbitMQ gives every second event to server-khhdbtbw, thus the page skips 49 and 39.
 - id: lessons
   layout: content
   title: TL;DR
