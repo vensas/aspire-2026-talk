@@ -319,26 +319,44 @@ slides:
     text: The changes apply only to the test. <code>aspire run</code> does not change.
 - id: replicas-in-tests
   layout: content
-  title: What the tests find
+  title: Two replicas show a bug
   blocks:
   - type: text
-    text: The test starts the server with 2 replicas, as in production. One instance hides these problems.
+    text: The test starts 2 server replicas, as in production. It sends 4 events. Each replica must stream all 4 to its browsers.
   - type: columns
     widths:
-    - 4
-    - 6
+    - 5
+    - 5
     columns:
-    - - type: box
-        items:
-        - label: Refill
-          text: "✓ The test gives capacity 42. A refill returns 42."
-        - label: Migration
-          text: "✓ An advisory lock lets only one replica migrate at a time."
-        - label: Live updates
-          text: "✗ Each replica sends only the events that it consumed. This test fails on purpose."
+    - - type: code
+        language: csharp
+        filename: CookieJarTests.cs
+        code: |
+          // One live stream per replica, like two browsers
+          var streams = fixture.Replicas
+              .Select(ReadLevelStreamAsync).ToList();
+
+          for (var i = 0; i < 4; i++)
+              await PublishCookieTakenAsync(amount: 1);
+
+          foreach (var stream in streams)
+              Assert.Equal([100, 99, 98, 97, 96], await stream);
     - - type: image
-        src: img/test-output.png
-        alt: 'Terminal. dotnet test passes 6 tests. The explicit SSE test fails: expected 100, 99, 98, 97, 96, actual 100, 99, 98.'
+        src: img/test-sse-failure.png
+        alt: Test output. LevelStream_OnEveryReplica_ReceivesEveryChange fails. Expected 100, 99, 98, 97, 96. Actual 100, 99, 98.
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: callout
+        variant: warning
+        title: The bug
+        text: RabbitMQ gives each event to one replica only.
+    - - type: callout
+        variant: trust
+        title: With 1 instance
+        text: The same test passes. The bug stays hidden.
 - id: compose
   layout: content
   title: Docker Compose

@@ -17,7 +17,7 @@ All decks are in `docs/`, the screenshots in `docs/img/`. The IT-Tage YAML is th
 ./generate-docs.sh
 ```
 
-The screenshots in `docs/img/` are real: the Aspire dashboard and the frontend from `aspire run`, and the test output from `dotnet test` and `dotnet run --project src/CookieJar.Tests -- -explicit only`.
+The screenshots in `docs/img/` are real: the Aspire dashboard and the frontend from `aspire run`, and the failing explicit test from `dotnet run --project src/CookieJar.Tests -- -explicit only`.
 
 ## Repository structure
 
