@@ -161,20 +161,23 @@ slides:
   layout: content
   title: How Aspire works
   blocks:
-  - type: mermaid
-    diagram: |
-      flowchart LR
-        A[AppHost<br/>.NET] -- API --> B[DCP<br/>Go binary]
-        B -- starts --> C[Containers<br/>and processes]
-        C -- OTLP --> D[Dashboard]
-  - type: box
-    items:
-    - label: Model
-      text: Each resource is an IResource with annotations. Build() makes the model real.
-    - label: WithReference
-      text: Gives ConnectionStrings__name as an environment variable, with the dynamic port.
-    - label: WaitFor
-      text: Holds the start until the dependency is healthy.
+  - type: text
+    text: <div class="card" style="width:100%;box-sizing:border-box;padding:16px 24px;border-left:4px solid var(--color-trust);"><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;"><h3 style="font-size:17px;font-weight:700;color:var(--text-trust);margin:0;">Runtime architecture</h3><span style="font-size:14px;color:var(--text-secondary);">The AppHost translates the model. DCP orchestrates the resources.</span><span style="margin-left:auto;font-size:12px;color:var(--text-secondary);opacity:0.8;">aspire.dev/architecture/overview</span></div><div style="display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;"><div style="background:var(--slide-bg-card);border:1px solid var(--color-trust);border-radius:8px;padding:10px 20px;font-size:16px;font-weight:600;line-height:1.4;color:var(--text-trust);white-space:nowrap;text-align:center;">AppHost<br><span style="font-weight:400;font-size:13px;color:var(--text-secondary);">.NET</span></div><div style="display:flex;flex-direction:column;align-items:center;padding:0 14px;gap:2px;"><span style="font-size:20px;line-height:1;color:var(--text-secondary);">⇄</span><span style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">KubernetesClient</span></div><div style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:8px;padding:10px 20px;font-size:16px;font-weight:600;line-height:1.4;color:var(--text-primary);white-space:nowrap;text-align:center;">DCP<br><span style="font-weight:400;font-size:13px;color:var(--text-secondary);">Go binary</span></div><div style="display:flex;flex-direction:column;align-items:center;padding:0 14px;gap:2px;"><span style="font-size:20px;line-height:1;color:var(--text-secondary);">→</span><span style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">starts and monitors</span></div><div style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:8px;padding:10px 20px;font-size:16px;font-weight:600;line-height:1.4;color:var(--text-primary);white-space:nowrap;text-align:center;">Resources<br><span style="font-weight:400;font-size:13px;color:var(--text-secondary);">containers and processes</span></div><div style="display:flex;flex-direction:column;align-items:center;padding:0 14px;gap:2px;"><span style="font-size:20px;line-height:1;color:var(--text-secondary);">→</span><span style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">OTLP</span></div><div style="background:var(--slide-bg-card);border:1px solid var(--color-trust);border-radius:8px;padding:10px 20px;font-size:16px;font-weight:600;line-height:1.4;color:var(--text-trust);white-space:nowrap;text-align:center;">Dashboard<br><span style="font-weight:400;font-size:13px;color:var(--text-secondary);">separate process</span></div></div></div>
+  - type: card-grid
+    columns: 2
+    cards:
+    - variant: quality
+      title: Annotation model
+      text: Each resource is an <code style="color:var(--text-primary);">IResource</code> with annotations. <code style="color:var(--text-primary);">Build()</code> makes the model real.
+    - variant: funding
+      title: WithReference
+      text: <code style="color:var(--text-primary);">.WithReference(db)</code> gives <code style="color:var(--text-primary);">ConnectionStrings__&lt;name&gt;</code> as an environment variable, with the dynamic port.
+    - variant: trust
+      title: Service discovery
+      text: Aspire gives the service URLs as environment variables. With <code style="color:var(--text-primary);">AddServiceDefaults()</code>, <code style="color:var(--text-primary);">http://server</code> works without more configuration.
+    - variant: quality
+      title: WaitFor
+      text: <code style="color:var(--text-primary);">.WaitFor(x)</code> holds the start until the dependency is healthy.
 - id: testing
   layout: content
   title: Aspire.Hosting.Testing
