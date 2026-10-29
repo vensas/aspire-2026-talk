@@ -178,6 +178,79 @@ slides:
     - variant: quality
       title: WaitFor
       text: <code style="color:var(--text-primary);">.WaitFor(x)</code> holds the start until the dependency is healthy.
+- id: project-a
+  layout: content
+  blocks:
+  - type: heading
+    label: From a real project
+    title: A delivery service with two replicas
+  - type: columns
+    widths:
+    - 6
+    - 4
+    columns:
+    - - type: code
+        language: csharp
+        filename: E2ETestHost.cs
+        code: |
+          // Containers only for this run. No shared data.
+          foreach (var r in appHost.Resources.OfType<ContainerResource>())
+              r.Annotations.Add(new ContainerLifetimeAnnotation
+                  { Lifetime = ContainerLifetime.Session });
+
+          // The upstream system is a fake in the test process
+          appHost.CreateResourceBuilder<ProjectResource>("api")
+              .WithEnvironment("UPSTREAM_URL", fakeUpstream.Url);
+
+          // Chaos: freeze the storage, then check the behavior
+          await DockerAsync("pause", storageContainerId);
+    - - type: box
+        title: What the tests check
+        items:
+        - label: Lock
+          text: Only one replica migrates. The cron job runs one time per tick.
+        - label: Outage
+          text: The cache answers. Else 503 with Retry-After.
+        - label: Runtime
+          text: Nightly, about 8 minutes.
+  - type: callout
+    variant: info
+    title: Recommendation
+    text: Run the E2E tests nightly. An environment variable turns the project on, thus the PR build skips it.
+- id: project-b
+  layout: content
+  blocks:
+  - type: heading
+    label: From a real project
+    title: A business application with a web UI
+  - type: columns
+    widths:
+    - 6
+    - 4
+    columns:
+    - - type: code
+        language: csharp
+        filename: AspireAppFixture.cs
+        code: |
+          appHost.CreateResourceBuilder<ProjectResource>("api")
+              // The real external system is not reachable
+              .WithEnvironment("EXTERNAL__MASTERDATA__BASEADDRESS",
+                  "http://127.0.0.1:9")
+              // Healthy = the API runs and asks for a login
+              .WithHttpHealthCheck("/v1/me", statusCode: 401);
+
+          await TestData.SeedAsync(NpgsqlDataSource.Create(
+              await app.GetConnectionStringAsync("app-db")));
+    - - type: list
+        title: How the team works
+        items:
+        - One test for each acceptance criterion
+        - UI, API and database in one run
+        - Playwright keeps the trace only after a failure
+  - type: callout
+    variant: info
+    title: Recommendation
+    text: Make each external system unreachable in the test. Then no test can call it by mistake.
 - id: testing
   layout: content
   title: Aspire.Hosting.Testing
@@ -259,79 +332,6 @@ slides:
     - - type: image
         src: img/test-output.png
         alt: 'Terminal. dotnet test passes 6 tests. The explicit SSE test fails: expected 100, 99, 98, 97, 96, actual 100, 99, 98.'
-- id: project-a
-  layout: content
-  blocks:
-  - type: heading
-    label: From a real project
-    title: A delivery service with two replicas
-  - type: columns
-    widths:
-    - 6
-    - 4
-    columns:
-    - - type: code
-        language: csharp
-        filename: E2ETestHost.cs
-        code: |
-          // Containers only for this run. No shared data.
-          foreach (var r in appHost.Resources.OfType<ContainerResource>())
-              r.Annotations.Add(new ContainerLifetimeAnnotation
-                  { Lifetime = ContainerLifetime.Session });
-
-          // The upstream system is a fake in the test process
-          appHost.CreateResourceBuilder<ProjectResource>("api")
-              .WithEnvironment("UPSTREAM_URL", fakeUpstream.Url);
-
-          // Chaos: freeze the storage, then check the behavior
-          await DockerAsync("pause", storageContainerId);
-    - - type: box
-        title: What the tests check
-        items:
-        - label: Lock
-          text: Only one replica migrates. The cron job runs one time per tick.
-        - label: Outage
-          text: The cache answers. Else 503 with Retry-After.
-        - label: Runtime
-          text: Nightly, about 8 minutes.
-  - type: callout
-    variant: info
-    title: Recommendation
-    text: Run the E2E tests nightly. An environment variable turns the project on, thus the PR build skips it.
-- id: project-b
-  layout: content
-  blocks:
-  - type: heading
-    label: From a real project
-    title: A business application with a web UI
-  - type: columns
-    widths:
-    - 6
-    - 4
-    columns:
-    - - type: code
-        language: csharp
-        filename: AspireAppFixture.cs
-        code: |
-          appHost.CreateResourceBuilder<ProjectResource>("api")
-              // The real external system is not reachable
-              .WithEnvironment("EXTERNAL__MASTERDATA__BASEADDRESS",
-                  "http://127.0.0.1:9")
-              // Healthy = the API runs and asks for a login
-              .WithHttpHealthCheck("/v1/me", statusCode: 401);
-
-          await TestData.SeedAsync(NpgsqlDataSource.Create(
-              await app.GetConnectionStringAsync("app-db")));
-    - - type: list
-        title: How the team works
-        items:
-        - One test for each acceptance criterion
-        - UI, API and database in one run
-        - Playwright keeps the trace only after a failure
-  - type: callout
-    variant: info
-    title: Recommendation
-    text: Make each external system unreachable in the test. Then no test can call it by mistake.
 - id: compose
   layout: content
   title: Docker Compose
