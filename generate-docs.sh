@@ -8,7 +8,7 @@
 # The generator repository must be beside this repository. Use the environment
 # variable DOC_GENERATOR_DIR to give a different path.
 #
-# The DWX deck (slides/slides-dwx.html) is hand-written HTML and is not made here.
+# The DWX deck (docs/aspire-in-der-praxis-dwx-2026-06-30.html) is hand-written HTML and is not made here.
 
 set -euo pipefail
 

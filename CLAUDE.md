@@ -14,8 +14,10 @@ A small distributed app that tracks the fill level of an office cookie jar in re
 
 | Event | Slides | Demo state |
 |---|---|---|
-| DWX 2026 (30.06.2026) | `slides/slides-dwx.html` | git tag `dwx-2026` (Aspire 13.4.6, custom Kamal pipeline step) — DO NOT modify the DWX slides |
+| DWX 2026 (30.06.2026) | `docs/aspire-in-der-praxis-dwx-2026-06-30.html` (+ `.pdf`) | git tag `dwx-2026` (Aspire 13.4.6, custom Kamal pipeline step) — DO NOT modify the DWX slides |
 | IT-Tage 2026 (Do 10.12.2026, 09:00–09:45, Frankfurt) | `docs/aspire-in-practice-it-tage-2026-12-10.yaml` → `.pdf` (English, ASD-STE100), speaker notes in `docs/aspire-in-practice-it-tage-2026-12-10-notes.md` | current `src/` (Aspire 13.6.4, `Vensas.Aspire.Hosting.Kamal`, `CookieJar.Tests`) |
+
+All decks live in `docs/`, named `<title>-<event>-<date>` like in `../playwright-2026-talk`. `docs/avatar.png` and `docs/dwx-feedback-qr-code.png` belong to the DWX HTML deck (relative links) — keep them beside it.
 
 ### IT-Tage deck (`docs/`)
 
