@@ -4,12 +4,14 @@ Slides and demo project for the 2026 Aspire talk.
 
 **From local development to tests and deployment.** Sven Hennessen · vensas GmbH
 
+**📄 Slides: [IT-Tage 2026 deck (PDF)](docs/aspire-in-practice-it-tage-2026-12-10.pdf)** · [speaker notes](docs/aspire-in-practice-it-tage-2026-12-10-notes.md) · demo code in [`src/`](src/)
+
 ## Slides
 
-| Document | Content |
+| Deck | Content |
 |---|---|
-| `aspire-in-practice-it-tage-2026-12-10` | **The current talk deck** for IT-Tage 2026 in Frankfurt, 10 December 2026, 09:00–09:45 (English). Speaker notes in `aspire-in-practice-it-tage-2026-12-10-notes.md`. Demo: this branch (Aspire 13.6.4, [Vensas.Aspire.Hosting.Kamal](https://github.com/vensas/aspire-hosting-kamal), Aspire.Hosting.Testing). |
-| `aspire-in-der-praxis-dwx-2026-06-30` | The talk deck for [DWX Developer World 2026](https://www.developer-week.de), 30 June 2026 (German). Hand-written HTML: open it in a browser, navigate with the arrow keys, press `S` for the speaker notes. Demo: git tag [`dwx-2026`](../../tree/dwx-2026) (Aspire 13.4.6). |
+| IT-Tage 2026 — [PDF](docs/aspire-in-practice-it-tage-2026-12-10.pdf) · [YAML source](docs/aspire-in-practice-it-tage-2026-12-10.yaml) · [speaker notes](docs/aspire-in-practice-it-tage-2026-12-10-notes.md) | **The current talk deck** for IT-Tage 2026 in Frankfurt, 10 December 2026, 09:00–09:45 (English). Demo: `main` (Aspire 13.6.4, [Vensas.Aspire.Hosting.Kamal](https://github.com/vensas/aspire-hosting-kamal), Aspire.Hosting.Testing). |
+| DWX 2026 — [PDF](docs/aspire-in-der-praxis-dwx-2026-06-30.pdf) · [HTML](docs/aspire-in-der-praxis-dwx-2026-06-30.html) | The talk deck for [DWX Developer World 2026](https://www.developer-week.de), 30 June 2026 (German). The HTML is the original: download it and open it in a browser, navigate with the arrow keys, press `S` for the speaker notes. Demo: git tag [`dwx-2026`](../../tree/dwx-2026) (Aspire 13.4.6). |
 
 All decks are in `docs/`, the screenshots in `docs/img/`. The IT-Tage YAML is the single source of truth; one command generates its PDF with the [vensas-doc-generator](https://github.com/vensas/vensas-doc-generator), which must be checked out beside this repository (or set `DOC_GENERATOR_DIR`):
 
