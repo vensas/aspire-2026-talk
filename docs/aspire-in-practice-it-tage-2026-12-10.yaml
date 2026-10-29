@@ -255,16 +255,18 @@ slides:
     text: Make each external system unreachable in the test. Then no test can call it by mistake.
 - id: testing
   layout: content
-  title: Aspire.Hosting.Testing
+  title: Test the real app
   blocks:
   - type: text
-    text: The AppHost is the test fixture. The test gets the same topology as aspire run.
+    text: Aspire.Hosting.Testing starts your AppHost in the test. The test gets the same services and containers as <code>aspire run</code>.
   - type: columns
     widths:
     - 5
     - 5
     columns:
-    - - type: code
+    - - type: text
+        text: <strong style="color:var(--text-accent);">1</strong> <strong style="color:var(--text-primary);">Check the model. No containers start.</strong>
+      - type: code
         language: csharp
         filename: AppModelTests.cs
         code: |
@@ -274,7 +276,9 @@ slides:
           var server = builder.Resources
               .Single(r => r.Name == "server");
           Assert.Equal(2, server.GetReplicaCount());
-    - - type: code
+    - - type: text
+        text: <strong style="color:var(--text-accent);">2</strong> <strong style="color:var(--text-primary);">Start the app and send a request.</strong>
+      - type: code
         language: csharp
         filename: CookieJarAppFixture.cs
         code: |
@@ -287,37 +291,38 @@ slides:
   - type: callout
     variant: info
     title: Recommendation
-    text: 'Run the model tests in each PR build: no containers, less than 1 s. The E2E tests start real containers one time for all tests.'
+    text: Run step 1 in each PR build. It takes less than 1 s. Step 2 starts the containers one time for all tests.
 - id: test-apphost
   layout: content
-  title: Change the AppHost for the test
+  title: Prepare the AppHost for the test
   blocks:
   - type: text
-    text: Before BuildAsync() the model is only data. You can remove, replace and add resources.
+    text: Before <code>BuildAsync()</code>, the test can change the app model. Three changes make the test reliable.
   - type: code
     language: csharp
     filename: CookieJarAppFixture.cs
     code: |
-      // Parameters as arguments. The build agent needs no user secrets.
+      // 1. Give the parameters as arguments. No user secrets are necessary.
       var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.CookieJar_AppHost>(
           ["Parameters:rabbitmq-password=e2e-test", "Parameters:cookie-jar-capacity=42"]);
 
-      // No UI and no random sensor. The test sends the events itself.
+      // 2. Remove the UI and the random sensor. The test sends the events.
       foreach (var r in builder.Resources.Where(r => r is PgAdminContainerResource
                    || r.Name.StartsWith("frontend") || r.Name.StartsWith("cookie-sensor")).ToList())
           builder.Resources.Remove(r);
 
-      // An empty database. Do not touch the volume of the local environment.
+      // 3. Remove the data volume. Each run starts with an empty database.
       foreach (var mount in postgres.Annotations.OfType<ContainerMountAnnotation>().ToList())
           postgres.Annotations.Remove(mount);
   - type: callout
     variant: info
-    title: Recommendation
-    text: Remove the data volume in the test. Each run then starts with an empty database.
+    text: The changes apply only to the test. <code>aspire run</code> does not change.
 - id: replicas-in-tests
   layout: content
-  title: Two replicas in the test
+  title: What the tests find
   blocks:
+  - type: text
+    text: The test starts the server with 2 replicas, as in production. One instance hides these problems.
   - type: columns
     widths:
     - 4
@@ -325,14 +330,12 @@ slides:
     columns:
     - - type: box
         items:
-        - label: Parameter
-          text: The test gives capacity 42 as an argument. A refill must return 42.
+        - label: Refill
+          text: "✓ The test gives capacity 42. A refill returns 42."
         - label: Migration
-          text: Both replicas start at the same time. An advisory lock lets only one of them migrate.
-        - label: SSE
-          text: Each replica streams only the events that it consumed. The explicit test shows this limit.
-      - type: text
-        text: One instance hides these problems. With WithReplicas(2) the test shows them.
+          text: "✓ An advisory lock lets only one replica migrate at a time."
+        - label: Live updates
+          text: "✗ Each replica sends only the events that it consumed. This test fails on purpose."
     - - type: image
         src: img/test-output.png
         alt: 'Terminal. dotnet test passes 6 tests. The explicit SSE test fails: expected 100, 99, 98, 97, 96, actual 100, 99, 98.'
