@@ -50,3 +50,5 @@ Thumbs.db
 
 # Deployment artifacts
 deploy/output
+# Impeccable design reviews
+.impeccable
