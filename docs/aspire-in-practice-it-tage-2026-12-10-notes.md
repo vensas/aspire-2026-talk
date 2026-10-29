@@ -22,4 +22,4 @@ Thursday 10 December 2026, 09:00–09:45, Frankfurt. The slides do not show the 
 | 16 | Kamal mapping | Each app gets its own Kamal config; the accessories belong to the first app — thus the sensor comes after the server in the AppHost. Podman: the scripts build the images, then `kamal deploy --skip-push`. |
 | 17 | Aspire MCP | **Demo:** ask the agent why replica 2 does not stream the new level. `aspire agent init` sets up the MCP server. |
 | 18 | TL;DR | Local development and Azure: use it now. Other targets: plan the work, or help to build them. |
-| 19 | Questions | QR codes: this repository and the Kamal package. Feedback through the IT-Tage rating. |
+| 19 | Questions | The QR code links to this repository. The last link is the Kamal package. Feedback through the IT-Tage rating. |
