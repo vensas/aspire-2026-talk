@@ -352,11 +352,11 @@ slides:
     - - type: callout
         variant: warning
         title: The bug
-        text: RabbitMQ gives each event to one replica only.
+        text: The database is correct. But only the replica that got the event tells its browsers.
     - - type: callout
         variant: trust
         title: With 1 instance
-        text: The same test passes. The bug stays hidden.
+        text: The same test passes. Thus the bug stays hidden until production.
 - id: compose
   layout: content
   title: 'Deployment: Docker Compose'
