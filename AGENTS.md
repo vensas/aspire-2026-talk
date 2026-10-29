@@ -27,12 +27,14 @@ Made with the vensas-doc-generator (`../vensas-doc-generator`), like `../playwri
 - The YAML is the only source; the PDF is generated. The generator rewrites the YAML on each run (it removes comments) — edit it with a YAML parser, not with a text search.
 - Put an image in a `columns` block beside the content, with an `alt`. `widths: [6, 4]` for a narrow image, `[4, 6]` for a wide one. Crop screenshots to the part that matters.
 - The screenshots in `docs/img/` are real (dashboard and frontend from `aspire run`, test output from the test runs). Make them again after a visual change.
-- The two customer-project slides carry the kicker `label: From a real project` on their first `heading` block and end with a `Recommendation` callout. Keep them anonymized.
+- The two customer-project slides carry the kicker `label: Testing · From a real project` on their first `heading` block, come after the three testing slides of the demo, and end with a `Recommendation` callout. Keep them anonymized.
 - No `caption` under code listings. Put the hints in a second `columns` row with the same `widths` below the listings, so the boxes line up. Use `warning` (orange) for a caveat and `trust` (teal) beside it — both are cards with the same padding; `info` (teal, smaller) for a fact or a `Recommendation` on its own. Give the boxes in one row the same number of text lines.
 - When you write the YAML from Ruby, do not reuse an object in two places (e.g. one `widths` array) — `to_yaml` then writes `&1`/`*1` aliases.
 - No `Demo` callouts on the slides — the demo commands are in the speaker notes.
 - The IT-Tage audience does not know the DWX talk. Do not tell a migration story (no "custom step → package", no "bug fixed since", no line counts of removed code). Aspire.Hosting.Testing and `Vensas.Aspire.Hosting.Kamal` are simply how the demo works.
-- Watch the slide width: a code line longer than about 60 characters in a half-width column overflows.
+- Code is 17px (a `<style>` text block on the about-me slide raises the generator default of 15px, so the back row can read it). Code lines must fit: about 48 characters in a half column (`widths: [5, 5]`), 59 in a `6` column, 103 at full width — the code card cuts longer lines. Keep a listing to about 10 lines.
+- Each content slide in an act carries the act as `label` on its first `heading` block: `Local development`, `Testing`, `Deployment`, `AI`. The real-project slides use `Testing · From a real project`.
+- Colors carry meaning: orange (`warning`, `accent`) is a caution or a problem, teal (`info`, `trust`, `quality`) is good news, a fact or a recommendation. In a `flow` row, highlight only the step that matters (orange) and keep the others one color.
 
 ### Services
 

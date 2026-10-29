@@ -27,6 +27,8 @@ slides:
     widths:
     - 2
     - 8.8
+  - type: text
+    text: "<style>.code-block pre{font-size:17px !important;line-height:1.5 !important}</style>"
   id: about-me
   layout: content
   title: About me
@@ -41,23 +43,25 @@ slides:
       title: Project Tye
       text: A Microsoft experiment. A CLI that starts all services.
     - label: '2023'
-      color: trust
+      color: muted
       title: ".NET Aspire preview"
       text: Build 2023. A tool for the local developer.
     - label: '2024'
-      color: accent
+      color: muted
       title: Aspire GA
       text: May 2024, on .NET 8. A stable API.
     - label: '2025'
-      color: green
+      color: accent
       title: Aspire on its own
       text: Not tied to .NET releases. Its own version numbers.
   - type: text
     text: This talk uses Aspire 13.6 on .NET 10.
 - id: demo-app
   layout: content
-  title: 'The demo app: the cookie jar'
   blocks:
+  - type: heading
+    label: Local development
+    title: 'The demo app: the cookie jar'
   - type: columns
     widths:
     - 6
@@ -82,12 +86,14 @@ slides:
         alt: The cookie jar page. The level is 89, with a button to refill the jar.
 - id: apphost
   layout: content
-  title: One AppHost for three languages
   blocks:
+  - type: heading
+    label: Local development
+    title: One AppHost for three languages
   - type: columns
     widths:
-    - 4
-    - 6
+    - 5
+    - 5
     columns:
     - - type: code
         language: csharp
@@ -112,8 +118,10 @@ slides:
         alt: The resource graph in the Aspire dashboard. Two server replicas, postgres, messaging, cookie-sensor and frontend. All are healthy.
 - id: dashboard
   layout: content
-  title: Logs, traces and metrics in one dashboard
   blocks:
+  - type: heading
+    label: Local development
+    title: Logs, traces and metrics in one dashboard
   - type: columns
     widths:
     - 4
@@ -133,8 +141,10 @@ slides:
         alt: The traces page. The cookie-taken events go to server-juwhhcaw and server-nsfcsabm in turns.
 - id: parameters
   layout: content
-  title: Parameters and secrets
   blocks:
+  - type: heading
+    label: Local development
+    title: Parameters and secrets
   - type: columns
     widths:
     - 5
@@ -148,10 +158,11 @@ slides:
           var password = builder.AddParameter(
               "rabbitmq-password", secret: true);
 
-          // Read the configuration, then use the default
+          // Read the configuration, then the default
           var capacity = builder.AddParameter(
               "cookie-jar-capacity",
-              config["Parameters:cookie-jar-capacity"] ?? "100");
+              config["Parameters:cookie-jar-capacity"]
+                  ?? "100");
     - - type: image
         src: img/dashboard-parameters.png
         alt: The parameters tab in the dashboard. cookie-jar-capacity is 100, rabbitmq-password is hidden.
@@ -161,30 +172,138 @@ slides:
         text: AddParameter(name, "100") sets a constant value. Aspire then ignores the configuration. Read the configuration first, as above.
 - id: internals
   layout: content
-  title: How Aspire works
   blocks:
+  - type: heading
+    label: Local development
+    title: How Aspire works
   - type: text
-    text: <div class="card" style="width:100%;box-sizing:border-box;padding:16px 24px;border-left:4px solid var(--color-trust);"><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;"><h3 style="font-size:17px;font-weight:700;color:var(--text-trust);margin:0;">Runtime architecture</h3><span style="font-size:14px;color:var(--text-secondary);">The AppHost translates the model. DCP orchestrates the resources.</span><span style="margin-left:auto;font-size:12px;color:var(--text-secondary);opacity:0.8;">aspire.dev/architecture/overview</span></div><div style="display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;"><div style="background:var(--slide-bg-card);border:1px solid var(--color-trust);border-radius:8px;padding:10px 20px;font-size:16px;font-weight:600;line-height:1.4;color:var(--text-trust);white-space:nowrap;text-align:center;">AppHost<br><span style="font-weight:400;font-size:13px;color:var(--text-secondary);">.NET</span></div><div style="display:flex;flex-direction:column;align-items:center;padding:0 14px;gap:2px;"><span style="font-size:20px;line-height:1;color:var(--text-secondary);">⇄</span><span style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">KubernetesClient</span></div><div style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:8px;padding:10px 20px;font-size:16px;font-weight:600;line-height:1.4;color:var(--text-primary);white-space:nowrap;text-align:center;">DCP<br><span style="font-weight:400;font-size:13px;color:var(--text-secondary);">Go binary</span></div><div style="display:flex;flex-direction:column;align-items:center;padding:0 14px;gap:2px;"><span style="font-size:20px;line-height:1;color:var(--text-secondary);">→</span><span style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">starts and monitors</span></div><div style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:8px;padding:10px 20px;font-size:16px;font-weight:600;line-height:1.4;color:var(--text-primary);white-space:nowrap;text-align:center;">Resources<br><span style="font-weight:400;font-size:13px;color:var(--text-secondary);">containers and processes</span></div><div style="display:flex;flex-direction:column;align-items:center;padding:0 14px;gap:2px;"><span style="font-size:20px;line-height:1;color:var(--text-secondary);">→</span><span style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">OTLP</span></div><div style="background:var(--slide-bg-card);border:1px solid var(--color-trust);border-radius:8px;padding:10px 20px;font-size:16px;font-weight:600;line-height:1.4;color:var(--text-trust);white-space:nowrap;text-align:center;">Dashboard<br><span style="font-weight:400;font-size:13px;color:var(--text-secondary);">separate process</span></div></div></div>
+    text: <div class="card" style="width:100%;box-sizing:border-box;padding:16px 24px;border-left:4px solid var(--color-trust);"><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;"><h3 style="font-size:17px;font-weight:700;color:var(--text-trust);margin:0;">Runtime architecture</h3><span style="font-size:14px;color:var(--text-secondary);">The AppHost translates the model. DCP orchestrates the resources.</span></div><div style="display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;"><div style="background:var(--slide-bg-card);border:1px solid var(--color-trust);border-radius:8px;padding:10px 20px;font-size:19px;font-weight:600;line-height:1.4;color:var(--text-trust);white-space:nowrap;text-align:center;">AppHost<br><span style="font-weight:400;font-size:15px;color:var(--text-secondary);">.NET</span></div><div style="display:flex;flex-direction:column;align-items:center;padding:0 14px;gap:2px;"><span style="font-size:20px;line-height:1;color:var(--text-secondary);">⇄</span><span style="font-size:14px;color:var(--text-secondary);white-space:nowrap;">KubernetesClient</span></div><div style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:8px;padding:10px 20px;font-size:19px;font-weight:600;line-height:1.4;color:var(--text-primary);white-space:nowrap;text-align:center;">DCP<br><span style="font-weight:400;font-size:15px;color:var(--text-secondary);">Go binary</span></div><div style="display:flex;flex-direction:column;align-items:center;padding:0 14px;gap:2px;"><span style="font-size:20px;line-height:1;color:var(--text-secondary);">→</span><span style="font-size:14px;color:var(--text-secondary);white-space:nowrap;">starts and monitors</span></div><div style="background:var(--slide-bg-card);border:1px solid var(--slide-border);border-radius:8px;padding:10px 20px;font-size:19px;font-weight:600;line-height:1.4;color:var(--text-primary);white-space:nowrap;text-align:center;">Resources<br><span style="font-weight:400;font-size:15px;color:var(--text-secondary);">containers and processes</span></div><div style="display:flex;flex-direction:column;align-items:center;padding:0 14px;gap:2px;"><span style="font-size:20px;line-height:1;color:var(--text-secondary);">→</span><span style="font-size:14px;color:var(--text-secondary);white-space:nowrap;">OTLP</span></div><div style="background:var(--slide-bg-card);border:1px solid var(--color-trust);border-radius:8px;padding:10px 20px;font-size:19px;font-weight:600;line-height:1.4;color:var(--text-trust);white-space:nowrap;text-align:center;">Dashboard<br><span style="font-weight:400;font-size:15px;color:var(--text-secondary);">separate process</span></div></div></div>
   - type: card-grid
     columns: 2
     cards:
     - variant: quality
       title: Annotation model
       text: Each resource is an <code style="color:var(--text-primary);">IResource</code> with annotations. <code style="color:var(--text-primary);">Build()</code> makes the model real.
-    - variant: funding
-      title: WithReference
-      text: <code style="color:var(--text-primary);">.WithReference(db)</code> gives <code style="color:var(--text-primary);">ConnectionStrings__&lt;name&gt;</code> as an environment variable, with the dynamic port.
-    - variant: trust
-      title: Service discovery
-      text: Aspire gives the service URLs as environment variables. With <code style="color:var(--text-primary);">AddServiceDefaults()</code>, <code style="color:var(--text-primary);">http://server</code> works without more configuration.
     - variant: quality
-      title: WaitFor
-      text: <code style="color:var(--text-primary);">.WaitFor(x)</code> holds the start until the dependency is healthy.
+      title: WithReference
+      text: Gives connection strings and service URLs as environment variables. No ports in the code.
+- id: testing
+  layout: content
+  blocks:
+  - type: heading
+    label: Testing
+    title: Test the real app
+  - type: text
+    text: Aspire.Hosting.Testing starts your AppHost in the test. The test gets the same services and containers as <code>aspire run</code>.
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: text
+        text: <strong style="color:var(--text-accent);">1</strong> <strong style="color:var(--text-primary);">Check the model. No containers start.</strong>
+      - type: code
+        language: csharp
+        filename: AppModelTests.cs
+        code: |
+          var builder = await
+            DistributedApplicationTestingBuilder
+              .CreateAsync<Projects.CookieJar_AppHost>();
+
+          var server = builder.Resources
+              .Single(r => r.Name == "server");
+          Assert.Equal(2, server.GetReplicaCount());
+    - - type: text
+        text: <strong style="color:var(--text-accent);">2</strong> <strong style="color:var(--text-primary);">Start the app and send a request.</strong>
+      - type: code
+        language: csharp
+        filename: CookieJarAppFixture.cs
+        code: |
+          App = await builder.BuildAsync(ct);
+          await App.StartAsync(ct);
+          await App.ResourceNotifications
+              .WaitForResourceHealthyAsync("server", ct);
+
+          var http = App.CreateHttpClient("server");
+  - type: callout
+    variant: info
+    title: Recommendation
+    text: Run step 1 in each PR build. It takes less than 1 s. Step 2 starts the containers one time for all tests.
+- id: test-apphost
+  layout: content
+  blocks:
+  - type: heading
+    label: Testing
+    title: Prepare the AppHost for the test
+  - type: text
+    text: Before <code>BuildAsync()</code>, the test can change the app model. Three changes make the test reliable.
+  - type: code
+    language: csharp
+    filename: CookieJarAppFixture.cs
+    code: |
+      // 1. Give the parameters as arguments. No user secrets are necessary.
+      var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.CookieJar_AppHost>(
+          ["Parameters:rabbitmq-password=e2e-test", "Parameters:cookie-jar-capacity=42"]);
+
+      // 2. Remove the UI and the random sensor. The test sends the events.
+      foreach (var r in builder.Resources.Where(r => r is PgAdminContainerResource
+                   || r.Name.StartsWith("frontend") || r.Name.StartsWith("cookie-sensor")).ToList())
+          builder.Resources.Remove(r);
+
+      // 3. Remove the data volume. Each run starts with an empty database.
+      foreach (var mount in postgres.Annotations.OfType<ContainerMountAnnotation>().ToList())
+          postgres.Annotations.Remove(mount);
+  - type: callout
+    variant: info
+    text: The changes apply only to the test. <code>aspire run</code> does not change.
+- id: replicas-in-tests
+  layout: content
+  blocks:
+  - type: heading
+    label: Testing
+    title: Two replicas show a bug
+  - type: text
+    text: The test starts 2 server replicas, as in production. It sends 4 events. Each replica must stream all 4 to its browsers.
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: code
+        language: csharp
+        filename: CookieJarTests.cs
+        code: |
+          // Start: 100. Each event takes 1 cookie.
+          var streams = fixture.Replicas
+              .Select(ReadLevelStreamAsync).ToList();
+
+          for (var i = 0; i < 4; i++)
+              await PublishCookieTakenAsync(amount: 1);
+
+          foreach (var stream in streams)
+              Assert.Equal([100, 99, 98, 97, 96],
+                  await stream);
+    - - type: image
+        src: img/test-sse-failure.png
+        alt: Test output. LevelStream_OnEveryReplica_ReceivesEveryChange fails. Expected 100, 99, 98, 97, 96. Actual 100, 99, 98.
+  - type: columns
+    widths:
+    - 5
+    - 5
+    columns:
+    - - type: callout
+        variant: warning
+        title: The bug
+        text: The database is correct. But only the replica that got the event tells its browsers.
+    - - type: callout
+        variant: accent
+        title: With 1 instance
+        text: The same test passes. Thus the bug stays hidden until production.
 - id: project-a
   layout: content
   blocks:
   - type: heading
-    label: From a real project
+    label: Testing · From a real project
     title: A delivery service with two replicas
   - type: columns
     widths:
@@ -195,8 +314,9 @@ slides:
         language: csharp
         filename: E2ETestHost.cs
         code: |
-          // Containers only for this run. No shared data.
-          foreach (var r in appHost.Resources.OfType<ContainerResource>())
+          // Each test run gets its own containers
+          foreach (var r in appHost.Resources
+                       .OfType<ContainerResource>())
               r.Annotations.Add(new ContainerLifetimeAnnotation
                   { Lifetime = ContainerLifetime.Session });
 
@@ -223,7 +343,7 @@ slides:
   layout: content
   blocks:
   - type: heading
-    label: From a real project
+    label: Testing · From a real project
     title: A business application with a web UI
   - type: columns
     widths:
@@ -253,114 +373,12 @@ slides:
     variant: info
     title: Recommendation
     text: Make each external system unreachable in the test. Then no test can call it by mistake.
-- id: testing
-  layout: content
-  title: Test the real app
-  blocks:
-  - type: text
-    text: Aspire.Hosting.Testing starts your AppHost in the test. The test gets the same services and containers as <code>aspire run</code>.
-  - type: columns
-    widths:
-    - 5
-    - 5
-    columns:
-    - - type: text
-        text: <strong style="color:var(--text-accent);">1</strong> <strong style="color:var(--text-primary);">Check the model. No containers start.</strong>
-      - type: code
-        language: csharp
-        filename: AppModelTests.cs
-        code: |
-          var builder = await DistributedApplicationTestingBuilder
-              .CreateAsync<Projects.CookieJar_AppHost>();
-
-          var server = builder.Resources
-              .Single(r => r.Name == "server");
-          Assert.Equal(2, server.GetReplicaCount());
-    - - type: text
-        text: <strong style="color:var(--text-accent);">2</strong> <strong style="color:var(--text-primary);">Start the app and send a request.</strong>
-      - type: code
-        language: csharp
-        filename: CookieJarAppFixture.cs
-        code: |
-          App = await builder.BuildAsync(ct);
-          await App.StartAsync(ct);
-          await App.ResourceNotifications
-              .WaitForResourceHealthyAsync("server", ct);
-
-          var http = App.CreateHttpClient("server");
-  - type: callout
-    variant: info
-    title: Recommendation
-    text: Run step 1 in each PR build. It takes less than 1 s. Step 2 starts the containers one time for all tests.
-- id: test-apphost
-  layout: content
-  title: Prepare the AppHost for the test
-  blocks:
-  - type: text
-    text: Before <code>BuildAsync()</code>, the test can change the app model. Three changes make the test reliable.
-  - type: code
-    language: csharp
-    filename: CookieJarAppFixture.cs
-    code: |
-      // 1. Give the parameters as arguments. No user secrets are necessary.
-      var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.CookieJar_AppHost>(
-          ["Parameters:rabbitmq-password=e2e-test", "Parameters:cookie-jar-capacity=42"]);
-
-      // 2. Remove the UI and the random sensor. The test sends the events.
-      foreach (var r in builder.Resources.Where(r => r is PgAdminContainerResource
-                   || r.Name.StartsWith("frontend") || r.Name.StartsWith("cookie-sensor")).ToList())
-          builder.Resources.Remove(r);
-
-      // 3. Remove the data volume. Each run starts with an empty database.
-      foreach (var mount in postgres.Annotations.OfType<ContainerMountAnnotation>().ToList())
-          postgres.Annotations.Remove(mount);
-  - type: callout
-    variant: info
-    text: The changes apply only to the test. <code>aspire run</code> does not change.
-- id: replicas-in-tests
-  layout: content
-  title: Two replicas show a bug
-  blocks:
-  - type: text
-    text: The test starts 2 server replicas, as in production. It sends 4 events. Each replica must stream all 4 to its browsers.
-  - type: columns
-    widths:
-    - 5
-    - 5
-    columns:
-    - - type: code
-        language: csharp
-        filename: CookieJarTests.cs
-        code: |
-          // One live stream per replica, like two browsers
-          var streams = fixture.Replicas
-              .Select(ReadLevelStreamAsync).ToList();
-
-          for (var i = 0; i < 4; i++)
-              await PublishCookieTakenAsync(amount: 1);
-
-          foreach (var stream in streams)
-              Assert.Equal([100, 99, 98, 97, 96], await stream);
-    - - type: image
-        src: img/test-sse-failure.png
-        alt: Test output. LevelStream_OnEveryReplica_ReceivesEveryChange fails. Expected 100, 99, 98, 97, 96. Actual 100, 99, 98.
-  - type: columns
-    widths:
-    - 5
-    - 5
-    columns:
-    - - type: callout
-        variant: warning
-        title: The bug
-        text: The database is correct. But only the replica that got the event tells its browsers.
-    - - type: callout
-        variant: trust
-        title: With 1 instance
-        text: The same test passes. Thus the bug stays hidden until production.
 - id: compose
   layout: content
-  title: 'Deployment: Docker Compose'
   blocks:
+  - type: heading
+    label: Deployment
+    title: Docker Compose
   - type: columns
     widths:
     - 5
@@ -370,13 +388,12 @@ slides:
         language: csharp
         filename: AppHost.cs
         code: |
-          builder.AddDockerComposeEnvironment("docker-compose")
-              .ConfigureComposeFile(compose =>
-              {
-                  compose.Services["server"]
+          builder.AddDockerComposeEnvironment(
+                  "docker-compose")
+              .ConfigureComposeFile(c =>
+                  c.Services["server"]
                       .DependsOn["postgres"]
-                      .Condition = "service_healthy";
-              });
+                      .Condition = "service_healthy");
 
           // aspire publish --output-path ./deploy/output
     - - type: code
@@ -397,7 +414,7 @@ slides:
     - 5
     columns:
     - - type: callout
-        variant: warning
+        variant: trust
         title: Azure is a first-class target too
         text: "<code>azd up</code> reads the same model. It is not part of this demo."
     - - type: callout
@@ -406,8 +423,10 @@ slides:
         text: The secrets come from <code>.env</code>.
 - id: kubernetes-kamal
   layout: content
-  title: 'Deployment: Kubernetes and Kamal'
   blocks:
+  - type: heading
+    label: Deployment
+    title: Kubernetes and Kamal
   - type: columns
     widths:
     - 5
@@ -428,7 +447,7 @@ slides:
         code: |
           builder.AddKamalEnvironment("kamal")
               .WithServers(vmIp)
-              .WithRegistry(registry, "unused")
+              .WithRegistry(registry, username)
               .WithProxyHostSuffix($"{vmIp}.nip.io");
 
           server.PublishAsKamalService((_, config) =>
@@ -442,15 +461,17 @@ slides:
     - - type: callout
         variant: warning
         title: Kubernetes is a preview
-        text: The Helm chart is a start, not the final chart.
+        text: The Helm chart is a start, not the final chart. Plan time to complete it.
     - - type: callout
         variant: trust
-        title: 'Kamal: an open-source NuGet package'
-        text: "<code>Vensas.Aspire.Hosting.Kamal</code>"
+        title: Kamal
+        text: Deploys containers to plain servers over SSH. It needs no Kubernetes.
 - id: kamal-mapping
   layout: content
-  title: 'Kamal: from the app model to deploy.yml'
   blocks:
+  - type: heading
+    label: Deployment
+    title: 'Kamal: from the app model to deploy.yml'
   - type: columns
     widths:
     - 5
@@ -464,10 +485,6 @@ slides:
           value: Accessories of the first app
         - key: WithExternalHttpEndpoints
           value: 'proxy: host, app_port, health check'
-        - key: Secret parameters
-          value: ".kamal/secrets, references only"
-        - key: WithReference(server)
-          value: Network alias server-web
     - - type: code
         language: yaml
         filename: deploy/output/kamal/config/deploy.yml
@@ -479,9 +496,6 @@ slides:
             app_port: 8080
             healthcheck:
               path: /health
-          env:
-            secret:
-              - ConnectionStrings__cookiejardb
           accessories:
             postgres:
               image: docker.io/library/postgres:18.3
@@ -500,8 +514,10 @@ slides:
         text: "<code>aspire publish</code> writes this file."
 - id: mcp
   layout: content
-  title: 'Aspire MCP: the agent sees the running app'
   blocks:
+  - type: heading
+    label: AI
+    title: 'Aspire MCP: the agent sees the running app'
   - type: text
     text: The MCP server gives the agent the resources, logs and traces of the running app. Not only the code.
   - type: code
@@ -516,15 +532,15 @@ slides:
       title: Prompt
       text: Why does replica 2 not stream the new level?
     - label: Step 2
-      color: accent
+      color: trust
       title: Resources
       text: list_resources gives the state of each replica.
     - label: Step 3
-      color: green
+      color: trust
       title: Logs
       text: list_structured_logs shows which replica consumed the event.
     - label: Step 4
-      color: trust
+      color: accent
       title: Answer
       text: The cause, with log lines. You decide on the fix.
 - id: lessons
